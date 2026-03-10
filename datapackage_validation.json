@@ -1,6 +1,6 @@
 {
   "version": "4.16.6",
-  "time": 0.193,
+  "time": 1.895,
   "errors": [],
   "tasks": [
     {
@@ -12,14 +12,14 @@
         "encoding": "utf-8-sig",
         "format": "csv",
         "hashing": "md5",
-        "name": "receita_2025",
-        "path": "data/receita_2025.csv",
+        "name": "receita_2022",
+        "path": "data/receita_2022.csv",
         "profile": "tabular-data-resource",
         "schema": {
           "fields": [
             {
-              "name": "ano_de_exercicio",
-              "type": "integer"
+              "name": "mes_ano_numerico",
+              "type": "string"
             },
             {
               "name": "unidade_orcamentaria_codigo",
@@ -31,6 +31,199 @@
             },
             {
               "name": "classificacao_receita_formatado",
+              "type": "string"
+            },
+            {
+              "name": "origem_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "origem_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_6",
+              "type": "any"
+            },
+            {
+              "name": "categoria_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "categoria_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "especie_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "especie_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_11",
+              "type": "any"
+            },
+            {
+              "name": "tipo_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "tipo_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_14",
+              "type": "any"
+            },
+            {
+              "name": "item_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "item_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_17",
+              "type": "any"
+            },
+            {
+              "name": "subitem_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "subitem_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_20",
+              "type": "any"
+            },
+            {
+              "name": "nivel_1_desdobramento_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "nivel_1_desdobramento_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_23",
+              "type": "any"
+            },
+            {
+              "name": "nivel_2_desdobramento_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "nivel_2_desdobramento_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_26",
+              "type": "any"
+            },
+            {
+              "name": "nivel_3_desdobramento_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "nivel_3_desdobramento_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_29",
+              "type": "any"
+            },
+            {
+              "name": "valor_previsto_inicial",
+              "type": "integer"
+            },
+            {
+              "name": "valor_previsto_atualizado",
+              "type": "integer"
+            },
+            {
+              "name": "valor_contabilizado",
+              "type": "string"
+            }
+          ]
+        },
+        "scheme": "file",
+        "title": "Insira um título humanamente legível para este recurso.",
+        "stats": {
+          "hash": "de9af2ed98e31e25e28fc6a3ee789737",
+          "bytes": 4691159,
+          "fields": 33,
+          "rows": 7846
+        }
+      },
+      "time": 0.416,
+      "scope": [
+        "hash-count-error",
+        "byte-count-error",
+        "field-count-error",
+        "row-count-error",
+        "blank-header",
+        "extra-label",
+        "missing-label",
+        "blank-label",
+        "duplicate-label",
+        "incorrect-label",
+        "blank-row",
+        "primary-key-error",
+        "foreign-key-error",
+        "extra-cell",
+        "missing-cell",
+        "type-error",
+        "constraint-error",
+        "unique-error"
+      ],
+      "partial": false,
+      "errors": [],
+      "stats": {
+        "errors": 0
+      },
+      "valid": true
+    },
+    {
+      "resource": {
+        "description": "Insira a descrição/explicação detalhada deste recurso.",
+        "dialect": {
+          "delimiter": ";"
+        },
+        "encoding": "utf-8-sig",
+        "format": "csv",
+        "hashing": "md5",
+        "name": "receita_2023",
+        "path": "data/receita_2023.csv",
+        "profile": "tabular-data-resource",
+        "schema": {
+          "fields": [
+            {
+              "name": "mes_ano_numerico",
+              "type": "string"
+            },
+            {
+              "name": "unidade_orcamentaria_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "unidade_orcamentaria_nome",
+              "type": "string"
+            },
+            {
+              "name": "classificacao_receita_formatado",
+              "type": "string"
+            },
+            {
+              "name": "origem_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "origem_receita_descricao",
               "type": "string"
             },
             {
@@ -50,10 +243,6 @@
               "type": "string"
             },
             {
-              "name": "unnamed_8",
-              "type": "any"
-            },
-            {
               "name": "tipo_receita_codigo",
               "type": "integer"
             },
@@ -62,7 +251,7 @@
               "type": "string"
             },
             {
-              "name": "unnamed_11",
+              "name": "unnamed_12",
               "type": "any"
             },
             {
@@ -74,7 +263,19 @@
               "type": "string"
             },
             {
-              "name": "unnamed_14",
+              "name": "unnamed_15",
+              "type": "any"
+            },
+            {
+              "name": "subitem_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "subitem_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_18",
               "type": "any"
             },
             {
@@ -86,7 +287,19 @@
               "type": "string"
             },
             {
-              "name": "unnamed_17",
+              "name": "unnamed_21",
+              "type": "any"
+            },
+            {
+              "name": "nivel_2_desdobramento_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "nivel_2_desdobramento_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_24",
               "type": "any"
             },
             {
@@ -98,11 +311,15 @@
               "type": "string"
             },
             {
-              "name": "unnamed_20",
+              "name": "unnamed_27",
               "type": "any"
             },
             {
               "name": "valor_previsto_inicial",
+              "type": "integer"
+            },
+            {
+              "name": "valor_previsto_atualizado",
               "type": "integer"
             },
             {
@@ -114,13 +331,383 @@
         "scheme": "file",
         "title": "Insira um título humanamente legível para este recurso.",
         "stats": {
-          "hash": "d5f66ff76564e6667e1bde9801fffa85",
-          "bytes": 439947,
-          "fields": 23,
-          "rows": 1204
+          "hash": "93936e02096a916ffbea9dc6e020c24e",
+          "bytes": 3899171,
+          "fields": 31,
+          "rows": 7725
         }
       },
-      "time": 0.076,
+      "time": 0.39,
+      "scope": [
+        "hash-count-error",
+        "byte-count-error",
+        "field-count-error",
+        "row-count-error",
+        "blank-header",
+        "extra-label",
+        "missing-label",
+        "blank-label",
+        "duplicate-label",
+        "incorrect-label",
+        "blank-row",
+        "primary-key-error",
+        "foreign-key-error",
+        "extra-cell",
+        "missing-cell",
+        "type-error",
+        "constraint-error",
+        "unique-error"
+      ],
+      "partial": false,
+      "errors": [],
+      "stats": {
+        "errors": 0
+      },
+      "valid": true
+    },
+    {
+      "resource": {
+        "description": "Insira a descrição/explicação detalhada deste recurso.",
+        "dialect": {
+          "delimiter": ";"
+        },
+        "encoding": "utf-8-sig",
+        "format": "csv",
+        "hashing": "md5",
+        "name": "receita_2024",
+        "path": "data/receita_2024.csv",
+        "profile": "tabular-data-resource",
+        "schema": {
+          "fields": [
+            {
+              "name": "mes_ano_numerico",
+              "type": "string"
+            },
+            {
+              "name": "unidade_orcamentaria_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "unidade_orcamentaria_nome",
+              "type": "string"
+            },
+            {
+              "name": "classificacao_receita_formatado",
+              "type": "string"
+            },
+            {
+              "name": "origem_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "origem_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_6",
+              "type": "any"
+            },
+            {
+              "name": "categoria_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "categoria_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "especie_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "especie_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_11",
+              "type": "any"
+            },
+            {
+              "name": "tipo_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "tipo_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_14",
+              "type": "any"
+            },
+            {
+              "name": "item_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "item_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_17",
+              "type": "any"
+            },
+            {
+              "name": "subitem_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "subitem_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_20",
+              "type": "any"
+            },
+            {
+              "name": "nivel_1_desdobramento_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "nivel_1_desdobramento_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_23",
+              "type": "any"
+            },
+            {
+              "name": "nivel_2_desdobramento_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "nivel_2_desdobramento_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_26",
+              "type": "any"
+            },
+            {
+              "name": "nivel_3_desdobramento_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "nivel_3_desdobramento_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_29",
+              "type": "any"
+            },
+            {
+              "name": "valor_previsto_inicial",
+              "type": "integer"
+            },
+            {
+              "name": "valor_previsto_atualizado",
+              "type": "integer"
+            },
+            {
+              "name": "valor_contabilizado",
+              "type": "string"
+            }
+          ]
+        },
+        "scheme": "file",
+        "title": "Insira um título humanamente legível para este recurso.",
+        "stats": {
+          "hash": "5903e470e75b7b33bb5fd0ff64d5be38",
+          "bytes": 3965518,
+          "fields": 33,
+          "rows": 7768
+        }
+      },
+      "time": 0.407,
+      "scope": [
+        "hash-count-error",
+        "byte-count-error",
+        "field-count-error",
+        "row-count-error",
+        "blank-header",
+        "extra-label",
+        "missing-label",
+        "blank-label",
+        "duplicate-label",
+        "incorrect-label",
+        "blank-row",
+        "primary-key-error",
+        "foreign-key-error",
+        "extra-cell",
+        "missing-cell",
+        "type-error",
+        "constraint-error",
+        "unique-error"
+      ],
+      "partial": false,
+      "errors": [],
+      "stats": {
+        "errors": 0
+      },
+      "valid": true
+    },
+    {
+      "resource": {
+        "description": "Insira a descrição/explicação detalhada deste recurso.",
+        "dialect": {
+          "delimiter": ";"
+        },
+        "encoding": "utf-8-sig",
+        "format": "csv",
+        "hashing": "md5",
+        "name": "receita_2025",
+        "path": "data/receita_2025.csv",
+        "profile": "tabular-data-resource",
+        "schema": {
+          "fields": [
+            {
+              "name": "mes_ano_numerico",
+              "type": "string"
+            },
+            {
+              "name": "unidade_orcamentaria_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "unidade_orcamentaria_nome",
+              "type": "string"
+            },
+            {
+              "name": "classificacao_receita_formatado",
+              "type": "string"
+            },
+            {
+              "name": "origem_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "origem_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_6",
+              "type": "any"
+            },
+            {
+              "name": "categoria_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "categoria_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "especie_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "especie_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_11",
+              "type": "any"
+            },
+            {
+              "name": "tipo_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "tipo_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_14",
+              "type": "any"
+            },
+            {
+              "name": "item_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "item_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_17",
+              "type": "any"
+            },
+            {
+              "name": "subitem_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "subitem_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_20",
+              "type": "any"
+            },
+            {
+              "name": "nivel_1_desdobramento_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "nivel_1_desdobramento_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_23",
+              "type": "any"
+            },
+            {
+              "name": "nivel_2_desdobramento_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "nivel_2_desdobramento_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_26",
+              "type": "any"
+            },
+            {
+              "name": "nivel_3_desdobramento_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "nivel_3_desdobramento_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_29",
+              "type": "any"
+            },
+            {
+              "name": "valor_previsto_inicial",
+              "type": "integer"
+            },
+            {
+              "name": "valor_previsto_atualizado",
+              "type": "integer"
+            },
+            {
+              "name": "valor_contabilizado",
+              "type": "string"
+            }
+          ]
+        },
+        "scheme": "file",
+        "title": "Insira um título humanamente legível para este recurso.",
+        "stats": {
+          "hash": "b2878f0b4a7f8a92b4b166ca6c0110b1",
+          "bytes": 4053005,
+          "fields": 33,
+          "rows": 7939
+        }
+      },
+      "time": 0.412,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -163,8 +750,8 @@
         "schema": {
           "fields": [
             {
-              "name": "ano_de_exercicio",
-              "type": "integer"
+              "name": "mes_ano_numerico",
+              "type": "string"
             },
             {
               "name": "unidade_orcamentaria_codigo",
@@ -177,6 +764,18 @@
             {
               "name": "classificacao_receita_formatado",
               "type": "string"
+            },
+            {
+              "name": "origem_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "origem_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_6",
+              "type": "any"
             },
             {
               "name": "categoria_receita_codigo",
@@ -195,7 +794,7 @@
               "type": "string"
             },
             {
-              "name": "unnamed_8",
+              "name": "unnamed_11",
               "type": "any"
             },
             {
@@ -207,7 +806,7 @@
               "type": "string"
             },
             {
-              "name": "unnamed_11",
+              "name": "unnamed_14",
               "type": "any"
             },
             {
@@ -219,7 +818,19 @@
               "type": "string"
             },
             {
-              "name": "unnamed_14",
+              "name": "unnamed_17",
+              "type": "any"
+            },
+            {
+              "name": "subitem_receita_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "subitem_receita_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_20",
               "type": "any"
             },
             {
@@ -231,7 +842,19 @@
               "type": "string"
             },
             {
-              "name": "unnamed_17",
+              "name": "unnamed_23",
+              "type": "any"
+            },
+            {
+              "name": "nivel_2_desdobramento_codigo",
+              "type": "integer"
+            },
+            {
+              "name": "nivel_2_desdobramento_descricao",
+              "type": "string"
+            },
+            {
+              "name": "unnamed_26",
               "type": "any"
             },
             {
@@ -243,11 +866,15 @@
               "type": "string"
             },
             {
-              "name": "unnamed_20",
+              "name": "unnamed_29",
               "type": "any"
             },
             {
               "name": "valor_previsto_inicial",
+              "type": "integer"
+            },
+            {
+              "name": "valor_previsto_atualizado",
               "type": "integer"
             },
             {
@@ -259,13 +886,13 @@
         "scheme": "file",
         "title": "Insira um título humanamente legível para este recurso.",
         "stats": {
-          "hash": "c3bb120857d9dc1508effd54dfeacd73",
-          "bytes": 349098,
-          "fields": 23,
-          "rows": 965
+          "hash": "85b928e95e424cca8e0b7d8313378f50",
+          "bytes": 1000024,
+          "fields": 33,
+          "rows": 1953
         }
       },
-      "time": 0.076,
+      "time": 0.133,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -296,7 +923,7 @@
   ],
   "stats": {
     "errors": 0,
-    "tasks": 2
+    "tasks": 5
   },
   "valid": true
 }
