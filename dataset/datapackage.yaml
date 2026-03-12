@@ -1,0 +1,384 @@
+name: portal_receita
+owner_org: ''
+profile: data-package
+resources:
+  - description: Insira a descrição/explicação detalhada deste recurso.
+    dialect:
+      delimiter: ;
+    encoding: utf-8-sig
+    format: csv
+    hashing: md5
+    name: receita_2022
+    path: data/receita_2022.csv
+    profile: tabular-data-resource
+    schema:
+      fields:
+        - name: ano_de_exercicio
+          type: integer
+        - name: unidade_orcamentaria_codigo
+          type: integer
+        - name: unidade_orcamentaria_nome
+          type: string
+        - name: fonte_recurso_codigo
+          type: integer
+        - name: fonte_recurso_descricao
+          type: string
+        - name: classificacao_receita_formatado
+          type: string
+        - name: origem_receita_codigo
+          type: integer
+        - name: origem_receita_descricao
+          type: string
+        - name: categoria_receita_codigo
+          type: integer
+        - name: categoria_receita_descricao
+          type: string
+        - name: especie_receita_codigo
+          type: integer
+        - name: especie_receita_descricao
+          type: string
+        - name: tipo_receita_codigo
+          type: integer
+        - name: tipo_receita_descricao
+          type: string
+        - name: item_receita_codigo
+          type: integer
+        - name: item_receita_descricao
+          type: string
+        - name: subitem_receita_codigo
+          type: integer
+        - name: subitem_receita_descricao
+          type: string
+        - name: nivel_1_desdobramento_codigo
+          type: integer
+        - name: nivel_1_desdobramento_descricao
+          type: string
+        - name: nivel_2_desdobramento_codigo
+          type: integer
+        - name: nivel_2_desdobramento_descricao
+          type: string
+        - name: nivel_3_desdobramento_codigo
+          type: integer
+        - name: nivel_3_desdobramento_descricao
+          type: string
+        - name: valor_previsto_inicial
+          type: any
+        - name: valor_previsto_atualizado
+          type: any
+        - name: valor_contabilizado
+          type: any
+    scheme: file
+    title: Insira um título humanamente legível para este recurso.
+  - description: Insira a descrição/explicação detalhada deste recurso.
+    dialect:
+      delimiter: ;
+    encoding: utf-8-sig
+    format: csv
+    hashing: md5
+    name: receita_2023
+    path: data/receita_2023.csv
+    profile: tabular-data-resource
+    schema:
+      fields:
+        - name: ano_de_exercicio
+          type: integer
+        - name: unidade_orcamentaria_nome
+          type: string
+        - name: classificacao_receita_formatado
+          type: string
+        - name: fonte_recurso_descricao
+          type: string
+        - name: origem_receita_codigo
+          type: integer
+        - name: origem_receita_descricao
+          type: string
+        - name: categoria_receita_codigo
+          type: integer
+        - name: categoria_receita_descricao
+          type: string
+        - name: especie_receita_codigo
+          type: integer
+        - name: especie_receita_descricao
+          type: string
+        - name: tipo_receita_codigo
+          type: integer
+        - name: tipo_receita_descricao
+          type: string
+        - name: unnamed_12
+          type: any
+        - name: item_receita_codigo
+          type: integer
+        - name: item_receita_descricao
+          type: string
+        - name: unnamed_15
+          type: any
+        - name: subitem_receita_codigo
+          type: integer
+        - name: subitem_receita_descricao
+          type: string
+        - name: unnamed_18
+          type: any
+        - name: nivel_1_desdobramento_codigo
+          type: integer
+        - name: nivel_1_desdobramento_descricao
+          type: string
+        - name: unnamed_21
+          type: any
+        - name: nivel_2_desdobramento_codigo
+          type: integer
+        - name: nivel_2_desdobramento_descricao
+          type: string
+        - name: unnamed_24
+          type: any
+        - name: nivel_3_desdobramento_codigo
+          type: integer
+        - name: nivel_3_desdobramento_descricao
+          type: string
+        - name: unnamed_27
+          type: any
+        - name: valor_previsto_inicial
+          type: integer
+        - name: valor_previsto_atualizado
+          type: integer
+        - name: valor_contabilizado
+          type: string
+    scheme: file
+    title: Insira um título humanamente legível para este recurso.
+  - description: Insira a descrição/explicação detalhada deste recurso.
+    dialect:
+      delimiter: ;
+    encoding: utf-8-sig
+    format: csv
+    hashing: md5
+    name: receita_2024
+    path: data/receita_2024.csv
+    profile: tabular-data-resource
+    schema:
+      fields:
+        - name: ano_de_exercicio
+          type: integer
+        - name: unidade_orcamentaria_nome
+          type: string
+        - name: classificacao_receita_formatado
+          type: string
+        - name: fonte_recurso_descricao
+          type: string
+        - name: origem_receita_codigo
+          type: integer
+        - name: origem_receita_descricao
+          type: string
+        - name: unnamed_6
+          type: any
+        - name: categoria_receita_codigo
+          type: integer
+        - name: categoria_receita_descricao
+          type: string
+        - name: especie_receita_codigo
+          type: integer
+        - name: especie_receita_descricao
+          type: string
+        - name: unnamed_11
+          type: any
+        - name: tipo_receita_codigo
+          type: integer
+        - name: tipo_receita_descricao
+          type: string
+        - name: unnamed_14
+          type: any
+        - name: item_receita_codigo
+          type: integer
+        - name: item_receita_descricao
+          type: string
+        - name: unnamed_17
+          type: any
+        - name: subitem_receita_codigo
+          type: integer
+        - name: subitem_receita_descricao
+          type: string
+        - name: unnamed_20
+          type: any
+        - name: nivel_1_desdobramento_codigo
+          type: integer
+        - name: nivel_1_desdobramento_descricao
+          type: string
+        - name: unnamed_23
+          type: any
+        - name: nivel_2_desdobramento_codigo
+          type: integer
+        - name: nivel_2_desdobramento_descricao
+          type: string
+        - name: unnamed_26
+          type: any
+        - name: nivel_3_desdobramento_codigo
+          type: integer
+        - name: nivel_3_desdobramento_descricao
+          type: string
+        - name: unnamed_29
+          type: any
+        - name: valor_previsto_inicial
+          type: integer
+        - name: valor_previsto_atualizado
+          type: integer
+        - name: valor_contabilizado
+          type: string
+    scheme: file
+    title: Insira um título humanamente legível para este recurso.
+  - description: Insira a descrição/explicação detalhada deste recurso.
+    dialect:
+      delimiter: ;
+    encoding: utf-8-sig
+    format: csv
+    hashing: md5
+    name: receita_2025
+    path: data/receita_2025.csv
+    profile: tabular-data-resource
+    schema:
+      fields:
+        - name: ano_de_exercicio
+          type: integer
+        - name: unidade_orcamentaria_nome
+          type: string
+        - name: classificacao_receita_formatado
+          type: string
+        - name: fonte_recurso_descricao
+          type: string
+        - name: origem_receita_codigo
+          type: integer
+        - name: origem_receita_descricao
+          type: string
+        - name: unnamed_6
+          type: any
+        - name: categoria_receita_codigo
+          type: integer
+        - name: categoria_receita_descricao
+          type: string
+        - name: especie_receita_codigo
+          type: integer
+        - name: especie_receita_descricao
+          type: string
+        - name: unnamed_11
+          type: any
+        - name: tipo_receita_codigo
+          type: integer
+        - name: tipo_receita_descricao
+          type: string
+        - name: unnamed_14
+          type: any
+        - name: item_receita_codigo
+          type: integer
+        - name: item_receita_descricao
+          type: string
+        - name: unnamed_17
+          type: any
+        - name: subitem_receita_codigo
+          type: integer
+        - name: subitem_receita_descricao
+          type: string
+        - name: unnamed_20
+          type: any
+        - name: nivel_1_desdobramento_codigo
+          type: integer
+        - name: nivel_1_desdobramento_descricao
+          type: string
+        - name: unnamed_23
+          type: any
+        - name: nivel_2_desdobramento_codigo
+          type: integer
+        - name: nivel_2_desdobramento_descricao
+          type: string
+        - name: unnamed_26
+          type: any
+        - name: nivel_3_desdobramento_codigo
+          type: integer
+        - name: nivel_3_desdobramento_descricao
+          type: string
+        - name: unnamed_29
+          type: any
+        - name: valor_previsto_inicial
+          type: integer
+        - name: valor_previsto_atualizado
+          type: integer
+        - name: valor_contabilizado
+          type: string
+    scheme: file
+    title: Insira um título humanamente legível para este recurso.
+  - description: Insira a descrição/explicação detalhada deste recurso.
+    dialect:
+      delimiter: ;
+    encoding: utf-8-sig
+    format: csv
+    hashing: md5
+    name: receita_2026
+    path: data/receita_2026.csv
+    profile: tabular-data-resource
+    schema:
+      fields:
+        - name: ano_de_exercicio
+          type: integer
+        - name: unidade_orcamentaria_nome
+          type: string
+        - name: classificacao_receita_formatado
+          type: string
+        - name: fonte_recurso_descricao
+          type: string
+        - name: origem_receita_codigo
+          type: integer
+        - name: origem_receita_descricao
+          type: string
+        - name: unnamed_6
+          type: any
+        - name: categoria_receita_codigo
+          type: integer
+        - name: categoria_receita_descricao
+          type: string
+        - name: especie_receita_codigo
+          type: integer
+        - name: especie_receita_descricao
+          type: string
+        - name: unnamed_11
+          type: any
+        - name: tipo_receita_codigo
+          type: integer
+        - name: tipo_receita_descricao
+          type: string
+        - name: unnamed_14
+          type: any
+        - name: item_receita_codigo
+          type: integer
+        - name: item_receita_descricao
+          type: string
+        - name: unnamed_17
+          type: any
+        - name: subitem_receita_codigo
+          type: integer
+        - name: subitem_receita_descricao
+          type: string
+        - name: unnamed_20
+          type: any
+        - name: nivel_1_desdobramento_codigo
+          type: integer
+        - name: nivel_1_desdobramento_descricao
+          type: string
+        - name: unnamed_23
+          type: any
+        - name: nivel_2_desdobramento_codigo
+          type: integer
+        - name: nivel_2_desdobramento_descricao
+          type: string
+        - name: unnamed_26
+          type: any
+        - name: nivel_3_desdobramento_codigo
+          type: integer
+        - name: nivel_3_desdobramento_descricao
+          type: string
+        - name: unnamed_29
+          type: any
+        - name: valor_previsto_inicial
+          type: integer
+        - name: valor_previsto_atualizado
+          type: integer
+        - name: valor_contabilizado
+          type: string
+    scheme: file
+    title: Insira um título humanamente legível para este recurso.
+title: Portal_receita
