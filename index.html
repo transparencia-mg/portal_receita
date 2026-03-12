@@ -233,7 +233,9 @@
             padding: 10px 8px;
             vertical-align: middle;
             border-bottom: 1px solid #f1f1f1;
-            white-space: nowrap;
+            white-space: normal;
+            word-wrap: break-word;
+            max-width: 300px;
         }
         
         .table tbody tr:hover {
@@ -248,10 +250,20 @@
             text-decoration: none;
             font-weight: 600;
             cursor: pointer;
+            display: inline-block;
+            white-space: normal;
+            word-wrap: break-word;
         }
         .orgao-link:hover { 
             color: var(--accent-red); 
             text-decoration: underline;
+        }
+
+        .orgao-cell {
+            white-space: normal;
+            word-wrap: break-word;
+            min-width: 200px;
+            max-width: 300px;
         }
 
         .badge-categoria {
@@ -735,12 +747,18 @@
             font-weight: 600;
             color: var(--primary-dark);
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
         .column-selector-grid {
             display: flex;
             flex-wrap: wrap;
             gap: 15px;
+            margin-bottom: 15px;
         }
         
         .column-selector-item {
@@ -764,6 +782,7 @@
             background: white;
             border-radius: 6px;
             border: 2px solid var(--primary-dark);
+            margin-top: 10px;
         }
         
         .code-toggle label {
@@ -777,6 +796,46 @@
             width: 18px;
             height: 18px;
             cursor: pointer;
+        }
+
+        .btn-clear-columns {
+            background: white;
+            border: 2px solid var(--accent-red);
+            color: var(--accent-red);
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-clear-columns:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .fixed-columns-label {
+            font-size: 12px;
+            color: var(--primary-dark);
+            font-weight: 600;
+            margin-left: 15px;
+            padding-left: 15px;
+            border-left: 2px solid #dee2e6;
+        }
+
+        .codigo-descricao {
+            display: inline-block;
+        }
+        .codigo {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-right: 4px;
+        }
+        .descricao {
+            color: #666;
         }
     </style>
 </head>
@@ -870,7 +929,7 @@
         let ordenacaoGeral = { coluna: 'orgao', direcao: 'asc' };
         let ordenacaoDetalhamento = { coluna: 'orgao', direcao: 'asc' };
         
-        // Configuração de colunas
+        // Configuração de colunas (agora apenas as que podem ser ocultadas)
         let colunasVisiveis = {
             orgao: true,
             classificacao: true,
@@ -882,12 +941,7 @@
             nivel2: true,
             nivel3: true,
             item: true,
-            subitem: true,
-            previstoInicial: true,
-            previstoAtualizado: true,
-            contabilizado: true,
-            percentual: true,
-            acoes: true
+            subitem: true
         };
         
         let mostrarCodigos = false;
@@ -1142,6 +1196,32 @@
         }
 
         // ============================================
+        // FUNÇÕES PARA DADOS DO GRÁFICO DE EVOLUÇÃO ANUAL
+        // ============================================
+        function getDadosEvolucaoAnual() {
+            const anos = ['2022', '2023', '2024', '2025', '2026'];
+            const dados = {
+                previstoInicial: [],
+                previstoAtualizado: [],
+                contabilizado: []
+            };
+            
+            anos.forEach(ano => {
+                const dadosAno = dadosCompletos.filter(item => item.ano_de_exercicio == ano);
+                
+                const totalPrevistoInicial = dadosAno.reduce((acc, item) => acc + (item.valor_previsto_inicial || 0), 0);
+                const totalPrevistoAtualizado = dadosAno.reduce((acc, item) => acc + (item.valor_previsto_atualizado || 0), 0);
+                const totalContabilizado = dadosAno.reduce((acc, item) => acc + (item.valor_contabilizado || 0), 0);
+                
+                dados.previstoInicial.push(totalPrevistoInicial);
+                dados.previstoAtualizado.push(totalPrevistoAtualizado);
+                dados.contabilizado.push(totalContabilizado);
+            });
+            
+            return { anos, dados };
+        }
+
+        // ============================================
         // VISÃO GERAL (Apenas Órgãos - UM POR LINHA)
         // ============================================
         function renderizarVisaoGeral() {
@@ -1185,11 +1265,8 @@
             const totalContabilizadoGeral = dadosTabela.reduce((acc, i) => acc + i.totalContabilizado, 0);
             const percentualGeral = calcularPercentual(totalContabilizadoGeral, totalPrevistoGeral);
             
-            // Gráfico
-            const orgaosGrafico = dadosTabela
-                .map(item => ({ orgao: item.orgao, valor: item.totalContabilizado }))
-                .sort((a, b) => b.valor - a.valor)
-                .slice(0, 10);
+            // Dados para o gráfico de evolução anual
+            const dadosEvolucao = getDadosEvolucaoAnual();
             
             // Ordenação
             dadosTabela.sort((a, b) => {
@@ -1284,10 +1361,10 @@
                     <div class="col-md-12">
                         <div class="chart-container">
                             <div class="chart-header">
-                                <h4 class="chart-title">Top 10 Órgãos por Arrecadação</h4>
+                                <h4 class="chart-title">Evolução Anual da Receita (2022-2026)</h4>
                             </div>
                             <div class="chart-wrapper">
-                                <canvas id="chartOrgaos"></canvas>
+                                <canvas id="chartEvolucaoAnual"></canvas>
                             </div>
                         </div>
                     </div>
@@ -1374,50 +1451,92 @@
             container.innerHTML = html;
             
             setTimeout(() => {
-                criarGraficoOrgaos(orgaosGrafico);
+                criarGraficoEvolucaoAnual(dadosEvolucao);
             }, 100);
         }
 
-        function criarGraficoOrgaos(dados) {
-            const canvas = document.getElementById('chartOrgaos');
+        function criarGraficoEvolucaoAnual(dadosEvolucao) {
+            const canvas = document.getElementById('chartEvolucaoAnual');
             if (!canvas) return;
             
             const ctx = canvas.getContext('2d');
             Chart.getChart(ctx)?.destroy();
             
-            if (!dados || dados.length === 0) {
-                ctx.font = '14px Montserrat';
-                ctx.fillStyle = '#666';
-                ctx.fillText('Sem dados para exibir', 10, 50);
-                return;
-            }
-            
             new Chart(ctx, {
-                type: 'bar',
+                type: 'line',
                 data: { 
-                    labels: dados.map(i => i.orgao.length > 25 ? i.orgao.substring(0, 25) + '...' : i.orgao), 
-                    datasets: [{
-                        label: 'Valor Contabilizado',
-                        data: dados.map(i => i.valor),
-                        backgroundColor: '#1a3a5c',
-                        borderRadius: 4
-                    }]
+                    labels: dadosEvolucao.anos,
+                    datasets: [
+                        {
+                            label: 'Previsto Inicial',
+                            data: dadosEvolucao.dados.previstoInicial,
+                            borderColor: '#1a3a5c',
+                            backgroundColor: 'rgba(26, 58, 92, 0.1)',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#1a3a5c',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Previsto Atualizado',
+                            data: dadosEvolucao.dados.previstoAtualizado,
+                            borderColor: '#ffc107',
+                            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#ffc107',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Contabilizado',
+                            data: dadosEvolucao.dados.contabilizado,
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#28a745',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            tension: 0.1
+                        }
+                    ]
                 },
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false,
                     plugins: { 
-                        legend: { display: false },
                         tooltip: { 
                             callbacks: { 
-                                label: ctx => `Valor: ${formatarMoeda(ctx.raw)}` 
+                                label: (ctx) => {
+                                    const label = ctx.dataset.label || '';
+                                    const valor = formatarMoeda(ctx.raw);
+                                    return `${label}: ${valor}`;
+                                }
                             } 
-                        } 
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 10,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
                     },
                     scales: {
                         y: {
+                            beginAtZero: true,
                             ticks: {
-                                callback: value => formatarMoeda(value).replace('R$', '')
+                                callback: value => formatarMoeda(value).replace('R$', 'R$ ')
                             }
                         }
                     }
@@ -1433,7 +1552,7 @@
             return dados.map(item => {
                 const percentual = calcularPercentual(item.totalContabilizado, item.totalPrevisto);
                 return `<tr>
-                    <td><a href="#" class="orgao-link" onclick="irParaDetalhamento('${item.orgao.replace(/'/g, "\\'")}')">${item.orgao}</a></td>
+                    <td class="orgao-cell"><a href="#" class="orgao-link" onclick="irParaDetalhamento('${item.orgao.replace(/'/g, "\\'")}')">${item.orgao}</a></td>
                     <td class="text-right">${formatarMoeda(item.totalPrevisto)}</td>
                     <td class="text-right">${formatarMoeda(item.totalPrevistoAtualizado)}</td>
                     <td class="text-right">${formatarMoeda(item.totalContabilizado)}</td>
@@ -1500,6 +1619,43 @@
         window.mudarPaginaGeral = function(pagina) {
             paginaAtual.geral = pagina;
             renderizarVisaoGeral();
+        };
+
+        // ============================================
+        // FUNÇÕES DE CONTROLE DE COLUNAS
+        // ============================================
+        window.toggleColuna = function(coluna) {
+            colunasVisiveis[coluna] = !colunasVisiveis[coluna];
+            renderizarDetalhamento();
+        };
+
+        window.toggleCodigos = function() {
+            mostrarCodigos = !mostrarCodigos;
+            renderizarDetalhamento();
+        };
+
+        window.toggleTodasColunas = function() {
+            // Verifica se todas as colunas estão marcadas
+            const todasMarcadas = Object.values(colunasVisiveis).every(valor => valor === true);
+            
+            // Se todas estão marcadas, desmarca todas. Senão, marca todas
+            const novoValor = !todasMarcadas;
+            
+            colunasVisiveis = {
+                orgao: novoValor,
+                classificacao: novoValor,
+                categoria: novoValor,
+                fonte: novoValor,
+                origem: novoValor,
+                especie: novoValor,
+                nivel1: novoValor,
+                nivel2: novoValor,
+                nivel3: novoValor,
+                item: novoValor,
+                subitem: novoValor
+            };
+            
+            renderizarDetalhamento();
         };
 
         // ============================================
@@ -1728,64 +1884,60 @@
                 
                 <div class="column-selector">
                     <div class="column-selector-title">
-                        <i class="material-icons me-2" style="font-size: 18px;">view_column</i> Selecione as colunas para exibir:
+                        <div>
+                            <i class="material-icons me-2" style="font-size: 18px;">view_column</i> Selecione as colunas para exibir:
+                        </div>
+                        <div>
+                            <button class="btn-clear-columns" onclick="toggleTodasColunas()">
+                                <i class="material-icons" style="font-size: 16px;">${Object.values(colunasVisiveis).every(v => v) ? 'check_box' : 'check_box_outline_blank'}</i> 
+                                ${Object.values(colunasVisiveis).every(v => v) ? 'Desmarcar todas' : 'Marcar todas'}
+                            </button>
+                        </div>
                     </div>
                     <div class="column-selector-grid">
                         <label class="column-selector-item">
-                            <input type="checkbox" ${colunasVisiveis.orgao ? 'checked' : ''} onchange="toggleColuna('orgao')"> Órgão
+                            <input type="checkbox" data-coluna="orgao" ${colunasVisiveis.orgao ? 'checked' : ''} onchange="toggleColuna('orgao')"> Órgão
                         </label>
                         <label class="column-selector-item">
-                            <input type="checkbox" ${colunasVisiveis.classificacao ? 'checked' : ''} onchange="toggleColuna('classificacao')"> Classificação
+                            <input type="checkbox" data-coluna="classificacao" ${colunasVisiveis.classificacao ? 'checked' : ''} onchange="toggleColuna('classificacao')"> Classificação
                         </label>
                         <label class="column-selector-item">
-                            <input type="checkbox" ${colunasVisiveis.categoria ? 'checked' : ''} onchange="toggleColuna('categoria')"> Categoria
+                            <input type="checkbox" data-coluna="categoria" ${colunasVisiveis.categoria ? 'checked' : ''} onchange="toggleColuna('categoria')"> Categoria
                         </label>
                         <label class="column-selector-item">
-                            <input type="checkbox" ${colunasVisiveis.fonte ? 'checked' : ''} onchange="toggleColuna('fonte')"> Fonte
+                            <input type="checkbox" data-coluna="fonte" ${colunasVisiveis.fonte ? 'checked' : ''} onchange="toggleColuna('fonte')"> Fonte
                         </label>
                         <label class="column-selector-item">
-                            <input type="checkbox" ${colunasVisiveis.origem ? 'checked' : ''} onchange="toggleColuna('origem')"> Origem
+                            <input type="checkbox" data-coluna="origem" ${colunasVisiveis.origem ? 'checked' : ''} onchange="toggleColuna('origem')"> Origem
                         </label>
                         <label class="column-selector-item">
-                            <input type="checkbox" ${colunasVisiveis.especie ? 'checked' : ''} onchange="toggleColuna('especie')"> Espécie
+                            <input type="checkbox" data-coluna="especie" ${colunasVisiveis.especie ? 'checked' : ''} onchange="toggleColuna('especie')"> Espécie
                         </label>
                         <label class="column-selector-item">
-                            <input type="checkbox" ${colunasVisiveis.nivel1 ? 'checked' : ''} onchange="toggleColuna('nivel1')"> Nível 1
+                            <input type="checkbox" data-coluna="nivel1" ${colunasVisiveis.nivel1 ? 'checked' : ''} onchange="toggleColuna('nivel1')"> Nível 1
                         </label>
                         <label class="column-selector-item">
-                            <input type="checkbox" ${colunasVisiveis.nivel2 ? 'checked' : ''} onchange="toggleColuna('nivel2')"> Nível 2
+                            <input type="checkbox" data-coluna="nivel2" ${colunasVisiveis.nivel2 ? 'checked' : ''} onchange="toggleColuna('nivel2')"> Nível 2
                         </label>
                         <label class="column-selector-item">
-                            <input type="checkbox" ${colunasVisiveis.nivel3 ? 'checked' : ''} onchange="toggleColuna('nivel3')"> Nível 3
+                            <input type="checkbox" data-coluna="nivel3" ${colunasVisiveis.nivel3 ? 'checked' : ''} onchange="toggleColuna('nivel3')"> Nível 3
                         </label>
                         <label class="column-selector-item">
-                            <input type="checkbox" ${colunasVisiveis.item ? 'checked' : ''} onchange="toggleColuna('item')"> Item
+                            <input type="checkbox" data-coluna="item" ${colunasVisiveis.item ? 'checked' : ''} onchange="toggleColuna('item')"> Item
                         </label>
                         <label class="column-selector-item">
-                            <input type="checkbox" ${colunasVisiveis.subitem ? 'checked' : ''} onchange="toggleColuna('subitem')"> Subitem
-                        </label>
-                        <label class="column-selector-item">
-                            <input type="checkbox" ${colunasVisiveis.previstoInicial ? 'checked' : ''} onchange="toggleColuna('previstoInicial')"> Previsto Inicial
-                        </label>
-                        <label class="column-selector-item">
-                            <input type="checkbox" ${colunasVisiveis.previstoAtualizado ? 'checked' : ''} onchange="toggleColuna('previstoAtualizado')"> Previsto Atualizado
-                        </label>
-                        <label class="column-selector-item">
-                            <input type="checkbox" ${colunasVisiveis.contabilizado ? 'checked' : ''} onchange="toggleColuna('contabilizado')"> Contabilizado
-                        </label>
-                        <label class="column-selector-item">
-                            <input type="checkbox" ${colunasVisiveis.percentual ? 'checked' : ''} onchange="toggleColuna('percentual')"> %
-                        </label>
-                        <label class="column-selector-item">
-                            <input type="checkbox" ${colunasVisiveis.acoes ? 'checked' : ''} onchange="toggleColuna('acoes')"> Ações
+                            <input type="checkbox" data-coluna="subitem" ${colunasVisiveis.subitem ? 'checked' : ''} onchange="toggleColuna('subitem')"> Subitem
                         </label>
                     </div>
                     
-                    <div class="mt-3">
+                    <div class="d-flex align-items-center justify-content-between">
                         <div class="code-toggle">
                             <input type="checkbox" id="mostrarCodigos" ${mostrarCodigos ? 'checked' : ''} onchange="toggleCodigos()">
-                            <label for="mostrarCodigos">Exibir códigos dos itens (ao invés das descrições)</label>
+                            <label for="mostrarCodigos">Exibir código + descrição</label>
                         </div>
+                        <span class="fixed-columns-label">
+                            <i class="material-icons" style="font-size: 14px; vertical-align: middle;">lock</i> Colunas fixas: Previsto Inicial, Previsto Atualizado, Contabilizado, % e Ações
+                        </span>
                     </div>
                 </div>
 
@@ -1826,11 +1978,11 @@
                                     ${colunasVisiveis.nivel3 ? '<th onclick="ordenarDetalhamento(\'nivel3\')" class="sortable ' + (ordenacaoDetalhamento.coluna === 'nivel3' ? ordenacaoDetalhamento.direcao : '') + '">Nível 3</th>' : ''}
                                     ${colunasVisiveis.item ? '<th onclick="ordenarDetalhamento(\'item\')" class="sortable ' + (ordenacaoDetalhamento.coluna === 'item' ? ordenacaoDetalhamento.direcao : '') + '">Item</th>' : ''}
                                     ${colunasVisiveis.subitem ? '<th onclick="ordenarDetalhamento(\'subitem\')" class="sortable ' + (ordenacaoDetalhamento.coluna === 'subitem' ? ordenacaoDetalhamento.direcao : '') + '">Subitem</th>' : ''}
-                                    ${colunasVisiveis.previstoInicial ? '<th onclick="ordenarDetalhamento(\'previsto\')" class="sortable text-right ' + (ordenacaoDetalhamento.coluna === 'previsto' ? ordenacaoDetalhamento.direcao : '') + '">Previsto Inicial</th>' : ''}
-                                    ${colunasVisiveis.previstoAtualizado ? '<th onclick="ordenarDetalhamento(\'previstoAtualizado\')" class="sortable text-right ' + (ordenacaoDetalhamento.coluna === 'previstoAtualizado' ? ordenacaoDetalhamento.direcao : '') + '">Previsto Atualizado</th>' : ''}
-                                    ${colunasVisiveis.contabilizado ? '<th onclick="ordenarDetalhamento(\'contabilizado\')" class="sortable text-right ' + (ordenacaoDetalhamento.coluna === 'contabilizado' ? ordenacaoDetalhamento.direcao : '') + '">Contabilizado</th>' : ''}
-                                    ${colunasVisiveis.percentual ? '<th onclick="ordenarDetalhamento(\'percentual\')" class="sortable text-center ' + (ordenacaoDetalhamento.coluna === 'percentual' ? ordenacaoDetalhamento.direcao : '') + '">%</th>' : ''}
-                                    ${colunasVisiveis.acoes ? '<th class="text-center">Ações</th>' : ''}
+                                    <th onclick="ordenarDetalhamento('previsto')" class="sortable text-right ${ordenacaoDetalhamento.coluna === 'previsto' ? ordenacaoDetalhamento.direcao : ''}">Previsto Inicial</th>
+                                    <th onclick="ordenarDetalhamento('previstoAtualizado')" class="sortable text-right ${ordenacaoDetalhamento.coluna === 'previstoAtualizado' ? ordenacaoDetalhamento.direcao : ''}">Previsto Atualizado</th>
+                                    <th onclick="ordenarDetalhamento('contabilizado')" class="sortable text-right ${ordenacaoDetalhamento.coluna === 'contabilizado' ? ordenacaoDetalhamento.direcao : ''}">Contabilizado</th>
+                                    <th onclick="ordenarDetalhamento('percentual')" class="sortable text-center ${ordenacaoDetalhamento.coluna === 'percentual' ? ordenacaoDetalhamento.direcao : ''}">%</th>
+                                    <th class="text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1838,12 +1990,12 @@
                             </tbody>
                             <tfoot class="table-footer">
                                 <tr>
-                                    <td colspan="${Object.values(colunasVisiveis).filter(Boolean).length - 3}" class="fw-bold">TOTAL GERAL</td>
-                                    ${colunasVisiveis.previstoInicial ? '<td class="text-right fw-bold">' + formatarMoeda(totalPrevistoGeral) + '</td>' : ''}
-                                    ${colunasVisiveis.previstoAtualizado ? '<td class="text-right fw-bold">' + formatarMoeda(totalPrevistoAtualizadoGeral) + '</td>' : ''}
-                                    ${colunasVisiveis.contabilizado ? '<td class="text-right fw-bold">' + formatarMoeda(totalContabilizadoGeral) + '</td>' : ''}
-                                    ${colunasVisiveis.percentual ? '<td class="text-center fw-bold">' + percentualGeral + '%</td>' : ''}
-                                    ${colunasVisiveis.acoes ? '<td></td>' : ''}
+                                    <td colspan="${Object.values(colunasVisiveis).filter(Boolean).length}" class="fw-bold">TOTAL GERAL</td>
+                                    <td class="text-right fw-bold">${formatarMoeda(totalPrevistoGeral)}</td>
+                                    <td class="text-right fw-bold">${formatarMoeda(totalPrevistoAtualizadoGeral)}</td>
+                                    <td class="text-right fw-bold">${formatarMoeda(totalContabilizadoGeral)}</td>
+                                    <td class="text-center fw-bold">${percentualGeral}%</td>
+                                    <td></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -1882,7 +2034,7 @@
 
         function gerarLinhasTabelaDetalhamento(dados) {
             if (!dados || dados.length === 0) {
-                const colspan = Object.values(colunasVisiveis).filter(Boolean).length;
+                const colspan = Object.values(colunasVisiveis).filter(Boolean).length + 4; // +4 para as colunas fixas
                 return `<tr><td colspan="${colspan}" class="text-center py-4">Nenhum dado encontrado</td></tr>`;
             }
             
@@ -1892,100 +2044,122 @@
                 let linha = '<tr>';
                 
                 if (colunasVisiveis.orgao) {
-                    linha += `<td>${item.unidade_orcamentaria_nome || '-'}</td>`;
+                    linha += `<td class="orgao-cell">${item.unidade_orcamentaria_nome || '-'}</td>`;
                 }
                 
                 if (colunasVisiveis.classificacao) {
-                    linha += `<td>${item.classificacao_receita_formatado ? item.classificacao_receita_formatado.substring(0,30) + '...' : '-'}</td>`;
+                    linha += `<td>${item.classificacao_receita_formatado ? item.classificacao_receita_formatado : '-'}</td>`;
                 }
                 
                 if (colunasVisiveis.categoria) {
-                    const categoria = mostrarCodigos ? (item.categoria_receita_codigo || '-') : (item.categoria_receita_descricao || '-');
-                    linha += `<td><span class="badge-categoria ${getCategoriaBadgeClass(item.categoria_receita_descricao)}">${categoria}</span></td>`;
+                    if (mostrarCodigos) {
+                        const codigo = item.categoria_receita_codigo || '-';
+                        const descricao = item.categoria_receita_descricao || '-';
+                        linha += `<td><span class="badge-categoria ${getCategoriaBadgeClass(item.categoria_receita_descricao)}"><span class="codigo">${codigo}</span> - <span class="descricao">${descricao}</span></span></td>`;
+                    } else {
+                        linha += `<td><span class="badge-categoria ${getCategoriaBadgeClass(item.categoria_receita_descricao)}">${item.categoria_receita_descricao || '-'}</span></td>`;
+                    }
                 }
                 
                 if (colunasVisiveis.fonte) {
-                    const fonte = mostrarCodigos ? (item.fonte_recurso_codigo || '-') : (item.fonte_recurso_descricao || '-');
-                    linha += `<td>${fonte}</td>`;
+                    if (mostrarCodigos) {
+                        const codigo = item.fonte_recurso_codigo || '-';
+                        const descricao = item.fonte_recurso_descricao || '-';
+                        linha += `<td><span class="codigo">${codigo}</span> - <span class="descricao">${descricao}</span></td>`;
+                    } else {
+                        linha += `<td>${item.fonte_recurso_descricao || '-'}</td>`;
+                    }
                 }
                 
                 if (colunasVisiveis.origem) {
-                    const origem = mostrarCodigos ? (item.origem_receita_codigo || '-') : (item.origem_receita_descricao || '-');
-                    linha += `<td>${origem}</td>`;
+                    if (mostrarCodigos) {
+                        const codigo = item.origem_receita_codigo || '-';
+                        const descricao = item.origem_receita_descricao || '-';
+                        linha += `<td><span class="codigo">${codigo}</span> - <span class="descricao">${descricao}</span></td>`;
+                    } else {
+                        linha += `<td>${item.origem_receita_descricao || '-'}</td>`;
+                    }
                 }
                 
                 if (colunasVisiveis.especie) {
-                    const especie = mostrarCodigos ? (item.especie_receita_codigo || '-') : (item.especie_receita_descricao || '-');
-                    linha += `<td>${especie}</td>`;
+                    if (mostrarCodigos) {
+                        const codigo = item.especie_receita_codigo || '-';
+                        const descricao = item.especie_receita_descricao || '-';
+                        linha += `<td><span class="codigo">${codigo}</span> - <span class="descricao">${descricao}</span></td>`;
+                    } else {
+                        linha += `<td>${item.especie_receita_descricao || '-'}</td>`;
+                    }
                 }
                 
                 if (colunasVisiveis.nivel1) {
-                    const nivel1 = mostrarCodigos ? (item.nivel_1_desdobramento_codigo || '-') : (item.nivel_1_desdobramento_descricao || '-');
-                    linha += `<td>${nivel1}</td>`;
+                    if (mostrarCodigos) {
+                        const codigo = item.nivel_1_desdobramento_codigo || '-';
+                        const descricao = item.nivel_1_desdobramento_descricao || '-';
+                        linha += `<td><span class="codigo">${codigo}</span> - <span class="descricao">${descricao}</span></td>`;
+                    } else {
+                        linha += `<td>${item.nivel_1_desdobramento_descricao || '-'}</td>`;
+                    }
                 }
                 
                 if (colunasVisiveis.nivel2) {
-                    const nivel2 = mostrarCodigos ? (item.nivel_2_desdobramento_codigo || '-') : (item.nivel_2_desdobramento_descricao || '-');
-                    linha += `<td>${nivel2}</td>`;
+                    if (mostrarCodigos) {
+                        const codigo = item.nivel_2_desdobramento_codigo || '-';
+                        const descricao = item.nivel_2_desdobramento_descricao || '-';
+                        linha += `<td><span class="codigo">${codigo}</span> - <span class="descricao">${descricao}</span></td>`;
+                    } else {
+                        linha += `<td>${item.nivel_2_desdobramento_descricao || '-'}</td>`;
+                    }
                 }
                 
                 if (colunasVisiveis.nivel3) {
-                    const nivel3 = mostrarCodigos ? (item.nivel_3_desdobramento_codigo || '-') : (item.nivel_3_desdobramento_descricao || '-');
-                    linha += `<td>${nivel3}</td>`;
+                    if (mostrarCodigos) {
+                        const codigo = item.nivel_3_desdobramento_codigo || '-';
+                        const descricao = item.nivel_3_desdobramento_descricao || '-';
+                        linha += `<td><span class="codigo">${codigo}</span> - <span class="descricao">${descricao}</span></td>`;
+                    } else {
+                        linha += `<td>${item.nivel_3_desdobramento_descricao || '-'}</td>`;
+                    }
                 }
                 
                 if (colunasVisiveis.item) {
-                    const itemDesc = mostrarCodigos ? (item.item_receita_codigo || '-') : (item.item_receita_descricao || '-');
-                    linha += `<td>${itemDesc}</td>`;
+                    if (mostrarCodigos) {
+                        const codigo = item.item_receita_codigo || '-';
+                        const descricao = item.item_receita_descricao || '-';
+                        linha += `<td><span class="codigo">${codigo}</span> - <span class="descricao">${descricao}</span></td>`;
+                    } else {
+                        linha += `<td>${item.item_receita_descricao || '-'}</td>`;
+                    }
                 }
                 
                 if (colunasVisiveis.subitem) {
-                    const subitem = mostrarCodigos ? (item.subitem_receita_codigo || '-') : (item.subitem_receita_descricao || '-');
-                    linha += `<td>${subitem}</td>`;
+                    if (mostrarCodigos) {
+                        const codigo = item.subitem_receita_codigo || '-';
+                        const descricao = item.subitem_receita_descricao || '-';
+                        linha += `<td><span class="codigo">${codigo}</span> - <span class="descricao">${descricao}</span></td>`;
+                    } else {
+                        linha += `<td>${item.subitem_receita_descricao || '-'}</td>`;
+                    }
                 }
                 
-                if (colunasVisiveis.previstoInicial) {
-                    linha += `<td class="text-right">${formatarMoeda(item.valor_previsto_inicial)}</td>`;
-                }
-                
-                if (colunasVisiveis.previstoAtualizado) {
-                    linha += `<td class="text-right">${formatarMoeda(item.valor_previsto_atualizado)}</td>`;
-                }
-                
-                if (colunasVisiveis.contabilizado) {
-                    linha += `<td class="text-right">${formatarMoeda(item.valor_contabilizado)}</td>`;
-                }
-                
-                if (colunasVisiveis.percentual) {
-                    linha += `<td class="text-center">
-                        <span class="badge ${parseFloat(percentual) >= 100 ? 'bg-success' : parseFloat(percentual) >= 90 ? 'bg-warning' : 'bg-danger'} text-white px-2 py-1">
-                            ${percentual}%
-                        </span>
-                    </td>`;
-                }
-                
-                if (colunasVisiveis.acoes) {
-                    linha += `<td class="text-center">
-                        <button class="btn-action" onclick='abrirModalDetalhes(${JSON.stringify([item]).replace(/'/g, "\\'")})' title="Ver detalhes">
-                            <i class="material-icons">visibility</i>
-                        </button>
-                    </td>`;
-                }
+                // Colunas fixas
+                linha += `<td class="text-right">${formatarMoeda(item.valor_previsto_inicial)}</td>`;
+                linha += `<td class="text-right">${formatarMoeda(item.valor_previsto_atualizado)}</td>`;
+                linha += `<td class="text-right">${formatarMoeda(item.valor_contabilizado)}</td>`;
+                linha += `<td class="text-center">
+                    <span class="badge ${parseFloat(percentual) >= 100 ? 'bg-success' : parseFloat(percentual) >= 90 ? 'bg-warning' : 'bg-danger'} text-white px-2 py-1">
+                        ${percentual}%
+                    </span>
+                </td>`;
+                linha += `<td class="text-center">
+                    <button class="btn-action" onclick='abrirModalDetalhes(${JSON.stringify([item]).replace(/'/g, "\\'")})' title="Ver detalhes">
+                        <i class="material-icons">visibility</i>
+                    </button>
+                </td>`;
                 
                 linha += '</tr>';
                 return linha;
             }).join('');
         }
-
-        window.toggleColuna = function(coluna) {
-            colunasVisiveis[coluna] = !colunasVisiveis[coluna];
-            renderizarDetalhamento();
-        };
-
-        window.toggleCodigos = function() {
-            mostrarCodigos = !mostrarCodigos;
-            renderizarDetalhamento();
-        };
 
         window.aplicarFiltrosDetalhamento = function() {
             filtrosDetalhamento.ano = document.getElementById('filtroAnoDetalhamento')?.value || '';
