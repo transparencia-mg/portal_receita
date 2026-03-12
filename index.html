@@ -205,7 +205,7 @@
         
         .table-fixed-header-container {
             position: relative;
-            max-height: 500px;
+            max-height: 600px;
             overflow: auto;
         }
         
@@ -217,14 +217,14 @@
             z-index: 10;
             font-weight: 600;
             padding: 12px 8px;
-            font-size: 13px;
+            font-size: 12px;
             text-transform: uppercase;
             white-space: nowrap;
         }
         
         .table {
             width: 100%;
-            font-size: 13px;
+            font-size: 12px;
             border-collapse: separate;
             border-spacing: 0;
         }
@@ -233,6 +233,7 @@
             padding: 10px 8px;
             vertical-align: middle;
             border-bottom: 1px solid #f1f1f1;
+            white-space: nowrap;
         }
         
         .table tbody tr:hover {
@@ -720,6 +721,63 @@
             padding: 12px 10px !important;
             background-color: #f8f9fa;
         }
+
+        .column-selector {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .column-selector-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+        
+        .column-selector-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .column-selector-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+        
+        .column-selector-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        
+        .code-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 15px;
+            background: white;
+            border-radius: 6px;
+            border: 2px solid var(--primary-dark);
+        }
+        
+        .code-toggle label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            cursor: pointer;
+        }
+        
+        .code-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -730,9 +788,7 @@
             <div class="nav-tabs-container">
                 <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
                     <li class="nav-item"><button class="nav-link active" id="visao-geral-tab" data-bs-toggle="tab" data-bs-target="#visao-geral"><i class="material-icons">bar_chart</i>Visão Geral</button></li>
-                    <li class="nav-item"><button class="nav-link" id="detalhamento-tab" data-bs-toggle="tab" data-bs-target="#detalhamento"><i class="material-icons">receipt</i>Detalhamento</button></li>
-                    <li class="nav-item"><button class="nav-link" id="categoria-tab" data-bs-toggle="tab" data-bs-target="#categoria"><i class="material-icons">category</i>Categoria</button></li>
-                    <li class="nav-item"><button class="nav-link" id="classificacao-tab" data-bs-toggle="tab" data-bs-target="#classificacao"><i class="material-icons">class</i>Classificação</button></li>
+                    <li class="nav-item"><button class="nav-link" id="detalhamento-tab" data-bs-toggle="tab" data-bs-target="#detalhamento"><i class="material-icons">receipt</i>Detalhamento Completo</button></li>
                     <li class="nav-item"><button class="nav-link" id="downloads-tab" data-bs-toggle="tab" data-bs-target="#downloads"><i class="material-icons">download</i>Downloads</button></li>
                 </ul>
             </div>
@@ -752,12 +808,6 @@
                 <div class="tab-pane fade" id="detalhamento" role="tabpanel">
                     <div id="detalhamento-content"></div>
                 </div>
-                <div class="tab-pane fade" id="categoria" role="tabpanel">
-                    <div id="categoria-content"></div>
-                </div>
-                <div class="tab-pane fade" id="classificacao" role="tabpanel">
-                    <div id="classificacao-content"></div>
-                </div>
                 <div class="tab-pane fade" id="downloads" role="tabpanel">
                     <div id="downloads-content"></div>
                 </div>
@@ -773,21 +823,6 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="modalContent"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary-custom" data-bs-dismiss="modal"><i class="material-icons me-2">close</i>Fechar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="categoriaModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content modal-creative">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="material-icons me-2">category</i> Detalhamento por Categoria</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="categoriaModalContent"></div>
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary-custom" data-bs-dismiss="modal"><i class="material-icons me-2">close</i>Fechar</button>
                 </div>
@@ -820,26 +855,42 @@
         let filtrosGeral = { ano: '' };
         let filtrosDetalhamento = { 
             ano: '', orgao: '', classificacao: '', categoria: '', origem: '', especie: '', tipo: '',
-            item: '', subitem: '', nivel1: '', nivel2: '', nivel3: '' 
+            fonte: '', item: '', subitem: '', nivel1: '', nivel2: '', nivel3: '' 
         };
-        let filtrosCategoria = { ano: '', categoria: '', origem: '', especie: '', tipo: '' };
-        let filtrosClassificacao = { ano: '', classificacao: '', orgao: '' };
         
         // Busca textual
         let buscaGeral = '';
         let buscaDetalhamento = '';
-        let buscaCategoria = '';
-        let buscaClassificacao = '';
         
         // Paginação
-        let paginaAtual = { geral: 1, detalhamento: 1, categoria: 1, classificacao: 1 };
+        let paginaAtual = { geral: 1, detalhamento: 1 };
         let itensPorPagina = 50;
         
         // Ordenação
         let ordenacaoGeral = { coluna: 'orgao', direcao: 'asc' };
         let ordenacaoDetalhamento = { coluna: 'orgao', direcao: 'asc' };
-        let ordenacaoCategoria = { coluna: 'categoria', direcao: 'asc' };
-        let ordenacaoClassificacao = { coluna: 'classificacao', direcao: 'asc' };
+        
+        // Configuração de colunas
+        let colunasVisiveis = {
+            orgao: true,
+            classificacao: true,
+            categoria: true,
+            fonte: true,
+            origem: true,
+            especie: true,
+            nivel1: true,
+            nivel2: true,
+            nivel3: true,
+            item: true,
+            subitem: true,
+            previstoInicial: true,
+            previstoAtualizado: true,
+            contabilizado: true,
+            percentual: true,
+            acoes: true
+        };
+        
+        let mostrarCodigos = false;
 
         // ============================================
         // FUNÇÕES DE INICIALIZAÇÃO
@@ -976,6 +1027,9 @@
                         case 'tipo':
                             if (item.tipo_receita_descricao !== value) return false;
                             break;
+                        case 'fonte':
+                            if (item.fonte_recurso_descricao !== value) return false;
+                            break;
                         case 'classificacao':
                             if (item.classificacao_receita_formatado !== value) return false;
                             break;
@@ -1055,14 +1109,10 @@
                         const anoAtual = anos[anos.length - 1];
                         filtrosGeral.ano = anoAtual;
                         filtrosDetalhamento.ano = anoAtual;
-                        filtrosCategoria.ano = anoAtual;
-                        filtrosClassificacao.ano = anoAtual;
                     }
                     
                     renderizarVisaoGeral();
                     renderizarDetalhamento();
-                    renderizarCategoria();
-                    renderizarClassificacao();
                     renderizarDownloads();
                 }
             } catch (erro) {
@@ -1080,6 +1130,7 @@
             const origens = [...new Set(dadosCompletos.map(i => i.origem_receita_descricao))].filter(Boolean).sort();
             const especies = [...new Set(dadosCompletos.map(i => i.especie_receita_descricao))].filter(Boolean).sort();
             const tipos = [...new Set(dadosCompletos.map(i => i.tipo_receita_descricao))].filter(Boolean).sort();
+            const fontes = [...new Set(dadosCompletos.map(i => i.fonte_recurso_descricao))].filter(Boolean).sort();
             const classificacoes = [...new Set(dadosCompletos.map(i => i.classificacao_receita_formatado))].filter(Boolean).sort();
             const itens = [...new Set(dadosCompletos.map(i => i.item_receita_descricao))].filter(Boolean).sort();
             const subitens = [...new Set(dadosCompletos.map(i => i.subitem_receita_descricao))].filter(Boolean).sort();
@@ -1087,7 +1138,7 @@
             const niveis2 = [...new Set(dadosCompletos.map(i => i.nivel_2_desdobramento_descricao))].filter(Boolean).sort();
             const niveis3 = [...new Set(dadosCompletos.map(i => i.nivel_3_desdobramento_descricao))].filter(Boolean).sort();
             
-            return { anos, orgaos, categorias, origens, especies, tipos, classificacoes, itens, subitens, niveis1, niveis2, niveis3 };
+            return { anos, orgaos, categorias, origens, especies, tipos, fontes, classificacoes, itens, subitens, niveis1, niveis2, niveis3 };
         }
 
         // ============================================
@@ -1452,7 +1503,7 @@
         };
 
         // ============================================
-        // DETALHAMENTO (Com todos os filtros)
+        // DETALHAMENTO COMPLETO (Com todos os itens)
         // ============================================
         function renderizarDetalhamento() {
             const container = document.getElementById('detalhamento-content');
@@ -1464,8 +1515,8 @@
             dadosFiltrados = aplicarBusca(dadosFiltrados, buscaDetalhamento, [
                 'unidade_orcamentaria_nome', 'classificacao_receita_formatado', 'categoria_receita_descricao',
                 'origem_receita_descricao', 'especie_receita_descricao', 'tipo_receita_descricao',
-                'item_receita_descricao', 'subitem_receita_descricao', 'nivel_1_desdobramento_descricao',
-                'nivel_2_desdobramento_descricao', 'nivel_3_desdobramento_descricao'
+                'fonte_recurso_descricao', 'item_receita_descricao', 'subitem_receita_descricao',
+                'nivel_1_desdobramento_descricao', 'nivel_2_desdobramento_descricao', 'nivel_3_desdobramento_descricao'
             ]);
             
             const totalPrevistoGeral = dadosFiltrados.reduce((acc, i) => acc + (i.valor_previsto_inicial || 0), 0);
@@ -1489,6 +1540,10 @@
                         valA = a.categoria_receita_descricao || '';
                         valB = b.categoria_receita_descricao || '';
                         break;
+                    case 'fonte':
+                        valA = a.fonte_recurso_descricao || '';
+                        valB = b.fonte_recurso_descricao || '';
+                        break;
                     case 'origem':
                         valA = a.origem_receita_descricao || '';
                         valB = b.origem_receita_descricao || '';
@@ -1500,6 +1555,26 @@
                     case 'tipo':
                         valA = a.tipo_receita_descricao || '';
                         valB = b.tipo_receita_descricao || '';
+                        break;
+                    case 'nivel1':
+                        valA = a.nivel_1_desdobramento_descricao || '';
+                        valB = b.nivel_1_desdobramento_descricao || '';
+                        break;
+                    case 'nivel2':
+                        valA = a.nivel_2_desdobramento_descricao || '';
+                        valB = b.nivel_2_desdobramento_descricao || '';
+                        break;
+                    case 'nivel3':
+                        valA = a.nivel_3_desdobramento_descricao || '';
+                        valB = b.nivel_3_desdobramento_descricao || '';
+                        break;
+                    case 'item':
+                        valA = a.item_receita_descricao || '';
+                        valB = b.item_receita_descricao || '';
+                        break;
+                    case 'subitem':
+                        valA = a.subitem_receita_descricao || '';
+                        valB = b.subitem_receita_descricao || '';
                         break;
                     case 'previsto':
                         valA = a.valor_previsto_inicial || 0;
@@ -1537,90 +1612,104 @@
             let html = `
                 <div class="filter-container">
                     <div class="row g-3">
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label class="filter-label"><i class="material-icons">calendar_today</i>Ano</label>
                             <select class="form-select" id="filtroAnoDetalhamento">
                                 <option value="">Selecione um ano</option>
                                 ${opcoes.anos.map(a => `<option value="${a}" ${filtrosDetalhamento.ano === a ? 'selected' : ''}>${a}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label class="filter-label"><i class="material-icons">business</i>Órgão</label>
                             <select class="form-select" id="filtroOrgaoDetalhamento">
                                 <option value="">Todos</option>
                                 ${opcoes.orgaos.map(o => `<option value="${o}" ${filtrosDetalhamento.orgao === o ? 'selected' : ''}>${o}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label class="filter-label"><i class="material-icons">class</i>Classificação</label>
                             <select class="form-select" id="filtroClassificacaoDetalhamento">
                                 <option value="">Todas</option>
                                 ${opcoes.classificacoes.map(c => `<option value="${c}" ${filtrosDetalhamento.classificacao === c ? 'selected' : ''}>${c.substring(0,30)}...</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label class="filter-label"><i class="material-icons">category</i>Categoria</label>
                             <select class="form-select" id="filtroCategoriaDetalhamento">
                                 <option value="">Todas</option>
                                 ${opcoes.categorias.map(c => `<option value="${c}" ${filtrosDetalhamento.categoria === c ? 'selected' : ''}>${c}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-2">
+                    </div>
+                    
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-3">
+                            <label class="filter-label"><i class="material-icons">source</i>Fonte</label>
+                            <select class="form-select" id="filtroFonteDetalhamento">
+                                <option value="">Todas</option>
+                                ${opcoes.fontes.map(f => `<option value="${f}" ${filtrosDetalhamento.fonte === f ? 'selected' : ''}>${f}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
                             <label class="filter-label"><i class="material-icons">source</i>Origem</label>
                             <select class="form-select" id="filtroOrigemDetalhamento">
                                 <option value="">Todas</option>
                                 ${opcoes.origens.map(o => `<option value="${o}" ${filtrosDetalhamento.origem === o ? 'selected' : ''}>${o}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label class="filter-label"><i class="material-icons">list</i>Espécie</label>
                             <select class="form-select" id="filtroEspecieDetalhamento">
                                 <option value="">Todas</option>
                                 ${opcoes.especies.map(e => `<option value="${e}" ${filtrosDetalhamento.especie === e ? 'selected' : ''}>${e}</option>`).join('')}
                             </select>
                         </div>
-                    </div>
-                    <div class="row g-3 mt-2">
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label class="filter-label"><i class="material-icons">format_list_bulleted</i>Tipo</label>
                             <select class="form-select" id="filtroTipoDetalhamento">
                                 <option value="">Todos</option>
                                 ${opcoes.tipos.map(t => `<option value="${t}" ${filtrosDetalhamento.tipo === t ? 'selected' : ''}>${t}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-2">
-                            <label class="filter-label"><i class="material-icons">inventory</i>Item</label>
-                            <select class="form-select" id="filtroItemDetalhamento">
-                                <option value="">Todos</option>
-                                ${opcoes.itens.map(i => `<option value="${i}" ${filtrosDetalhamento.item === i ? 'selected' : ''}>${i.substring(0,20)}...</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="filter-label"><i class="material-icons">subdirectory_arrow_right</i>Subitem</label>
-                            <select class="form-select" id="filtroSubitemDetalhamento">
-                                <option value="">Todos</option>
-                                ${opcoes.subitens.map(s => `<option value="${s}" ${filtrosDetalhamento.subitem === s ? 'selected' : ''}>${s.substring(0,20)}...</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="col-md-2">
+                    </div>
+                    
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-3">
                             <label class="filter-label"><i class="material-icons">layers</i>Nível 1</label>
                             <select class="form-select" id="filtroNivel1Detalhamento">
                                 <option value="">Todos</option>
                                 ${opcoes.niveis1.map(n => `<option value="${n}" ${filtrosDetalhamento.nivel1 === n ? 'selected' : ''}>${n}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label class="filter-label"><i class="material-icons">layers</i>Nível 2</label>
                             <select class="form-select" id="filtroNivel2Detalhamento">
                                 <option value="">Todos</option>
                                 ${opcoes.niveis2.map(n => `<option value="${n}" ${filtrosDetalhamento.nivel2 === n ? 'selected' : ''}>${n}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label class="filter-label"><i class="material-icons">layers</i>Nível 3</label>
                             <select class="form-select" id="filtroNivel3Detalhamento">
                                 <option value="">Todos</option>
                                 ${opcoes.niveis3.map(n => `<option value="${n}" ${filtrosDetalhamento.nivel3 === n ? 'selected' : ''}>${n}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="filter-label"><i class="material-icons">inventory</i>Item</label>
+                            <select class="form-select" id="filtroItemDetalhamento">
+                                <option value="">Todos</option>
+                                ${opcoes.itens.map(i => `<option value="${i}" ${filtrosDetalhamento.item === i ? 'selected' : ''}>${i.substring(0,20)}...</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-3">
+                            <label class="filter-label"><i class="material-icons">subdirectory_arrow_right</i>Subitem</label>
+                            <select class="form-select" id="filtroSubitemDetalhamento">
+                                <option value="">Todos</option>
+                                ${opcoes.subitens.map(s => `<option value="${s}" ${filtrosDetalhamento.subitem === s ? 'selected' : ''}>${s.substring(0,20)}...</option>`).join('')}
                             </select>
                         </div>
                     </div>
@@ -1633,6 +1722,69 @@
                             <button class="btn-secondary-custom" onclick="limparFiltrosDetalhamento()">
                                 <i class="material-icons me-2">clear</i>Limpar filtros
                             </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="column-selector">
+                    <div class="column-selector-title">
+                        <i class="material-icons me-2" style="font-size: 18px;">view_column</i> Selecione as colunas para exibir:
+                    </div>
+                    <div class="column-selector-grid">
+                        <label class="column-selector-item">
+                            <input type="checkbox" ${colunasVisiveis.orgao ? 'checked' : ''} onchange="toggleColuna('orgao')"> Órgão
+                        </label>
+                        <label class="column-selector-item">
+                            <input type="checkbox" ${colunasVisiveis.classificacao ? 'checked' : ''} onchange="toggleColuna('classificacao')"> Classificação
+                        </label>
+                        <label class="column-selector-item">
+                            <input type="checkbox" ${colunasVisiveis.categoria ? 'checked' : ''} onchange="toggleColuna('categoria')"> Categoria
+                        </label>
+                        <label class="column-selector-item">
+                            <input type="checkbox" ${colunasVisiveis.fonte ? 'checked' : ''} onchange="toggleColuna('fonte')"> Fonte
+                        </label>
+                        <label class="column-selector-item">
+                            <input type="checkbox" ${colunasVisiveis.origem ? 'checked' : ''} onchange="toggleColuna('origem')"> Origem
+                        </label>
+                        <label class="column-selector-item">
+                            <input type="checkbox" ${colunasVisiveis.especie ? 'checked' : ''} onchange="toggleColuna('especie')"> Espécie
+                        </label>
+                        <label class="column-selector-item">
+                            <input type="checkbox" ${colunasVisiveis.nivel1 ? 'checked' : ''} onchange="toggleColuna('nivel1')"> Nível 1
+                        </label>
+                        <label class="column-selector-item">
+                            <input type="checkbox" ${colunasVisiveis.nivel2 ? 'checked' : ''} onchange="toggleColuna('nivel2')"> Nível 2
+                        </label>
+                        <label class="column-selector-item">
+                            <input type="checkbox" ${colunasVisiveis.nivel3 ? 'checked' : ''} onchange="toggleColuna('nivel3')"> Nível 3
+                        </label>
+                        <label class="column-selector-item">
+                            <input type="checkbox" ${colunasVisiveis.item ? 'checked' : ''} onchange="toggleColuna('item')"> Item
+                        </label>
+                        <label class="column-selector-item">
+                            <input type="checkbox" ${colunasVisiveis.subitem ? 'checked' : ''} onchange="toggleColuna('subitem')"> Subitem
+                        </label>
+                        <label class="column-selector-item">
+                            <input type="checkbox" ${colunasVisiveis.previstoInicial ? 'checked' : ''} onchange="toggleColuna('previstoInicial')"> Previsto Inicial
+                        </label>
+                        <label class="column-selector-item">
+                            <input type="checkbox" ${colunasVisiveis.previstoAtualizado ? 'checked' : ''} onchange="toggleColuna('previstoAtualizado')"> Previsto Atualizado
+                        </label>
+                        <label class="column-selector-item">
+                            <input type="checkbox" ${colunasVisiveis.contabilizado ? 'checked' : ''} onchange="toggleColuna('contabilizado')"> Contabilizado
+                        </label>
+                        <label class="column-selector-item">
+                            <input type="checkbox" ${colunasVisiveis.percentual ? 'checked' : ''} onchange="toggleColuna('percentual')"> %
+                        </label>
+                        <label class="column-selector-item">
+                            <input type="checkbox" ${colunasVisiveis.acoes ? 'checked' : ''} onchange="toggleColuna('acoes')"> Ações
+                        </label>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <div class="code-toggle">
+                            <input type="checkbox" id="mostrarCodigos" ${mostrarCodigos ? 'checked' : ''} onchange="toggleCodigos()">
+                            <label for="mostrarCodigos">Exibir códigos dos itens (ao invés das descrições)</label>
                         </div>
                     </div>
                 </div>
@@ -1663,17 +1815,22 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th onclick="ordenarDetalhamento('orgao')" class="sortable ${ordenacaoDetalhamento.coluna === 'orgao' ? ordenacaoDetalhamento.direcao : ''}">Órgão</th>
-                                    <th onclick="ordenarDetalhamento('classificacao')" class="sortable ${ordenacaoDetalhamento.coluna === 'classificacao' ? ordenacaoDetalhamento.direcao : ''}">Classificação</th>
-                                    <th onclick="ordenarDetalhamento('categoria')" class="sortable ${ordenacaoDetalhamento.coluna === 'categoria' ? ordenacaoDetalhamento.direcao : ''}">Categoria</th>
-                                    <th onclick="ordenarDetalhamento('origem')" class="sortable ${ordenacaoDetalhamento.coluna === 'origem' ? ordenacaoDetalhamento.direcao : ''}">Origem</th>
-                                    <th onclick="ordenarDetalhamento('especie')" class="sortable ${ordenacaoDetalhamento.coluna === 'especie' ? ordenacaoDetalhamento.direcao : ''}">Espécie</th>
-                                    <th onclick="ordenarDetalhamento('tipo')" class="sortable ${ordenacaoDetalhamento.coluna === 'tipo' ? ordenacaoDetalhamento.direcao : ''}">Tipo</th>
-                                    <th onclick="ordenarDetalhamento('previsto')" class="sortable text-right ${ordenacaoDetalhamento.coluna === 'previsto' ? ordenacaoDetalhamento.direcao : ''}">Previsto Inicial</th>
-                                    <th onclick="ordenarDetalhamento('previstoAtualizado')" class="sortable text-right ${ordenacaoDetalhamento.coluna === 'previstoAtualizado' ? ordenacaoDetalhamento.direcao : ''}">Previsto Atualizado</th>
-                                    <th onclick="ordenarDetalhamento('contabilizado')" class="sortable text-right ${ordenacaoDetalhamento.coluna === 'contabilizado' ? ordenacaoDetalhamento.direcao : ''}">Contabilizado</th>
-                                    <th onclick="ordenarDetalhamento('percentual')" class="sortable text-center ${ordenacaoDetalhamento.coluna === 'percentual' ? ordenacaoDetalhamento.direcao : ''}">%</th>
-                                    <th class="text-center">Ações</th>
+                                    ${colunasVisiveis.orgao ? '<th onclick="ordenarDetalhamento(\'orgao\')" class="sortable ' + (ordenacaoDetalhamento.coluna === 'orgao' ? ordenacaoDetalhamento.direcao : '') + '">Órgão</th>' : ''}
+                                    ${colunasVisiveis.classificacao ? '<th onclick="ordenarDetalhamento(\'classificacao\')" class="sortable ' + (ordenacaoDetalhamento.coluna === 'classificacao' ? ordenacaoDetalhamento.direcao : '') + '">Classificação</th>' : ''}
+                                    ${colunasVisiveis.categoria ? '<th onclick="ordenarDetalhamento(\'categoria\')" class="sortable ' + (ordenacaoDetalhamento.coluna === 'categoria' ? ordenacaoDetalhamento.direcao : '') + '">Categoria</th>' : ''}
+                                    ${colunasVisiveis.fonte ? '<th onclick="ordenarDetalhamento(\'fonte\')" class="sortable ' + (ordenacaoDetalhamento.coluna === 'fonte' ? ordenacaoDetalhamento.direcao : '') + '">Fonte</th>' : ''}
+                                    ${colunasVisiveis.origem ? '<th onclick="ordenarDetalhamento(\'origem\')" class="sortable ' + (ordenacaoDetalhamento.coluna === 'origem' ? ordenacaoDetalhamento.direcao : '') + '">Origem</th>' : ''}
+                                    ${colunasVisiveis.especie ? '<th onclick="ordenarDetalhamento(\'especie\')" class="sortable ' + (ordenacaoDetalhamento.coluna === 'especie' ? ordenacaoDetalhamento.direcao : '') + '">Espécie</th>' : ''}
+                                    ${colunasVisiveis.nivel1 ? '<th onclick="ordenarDetalhamento(\'nivel1\')" class="sortable ' + (ordenacaoDetalhamento.coluna === 'nivel1' ? ordenacaoDetalhamento.direcao : '') + '">Nível 1</th>' : ''}
+                                    ${colunasVisiveis.nivel2 ? '<th onclick="ordenarDetalhamento(\'nivel2\')" class="sortable ' + (ordenacaoDetalhamento.coluna === 'nivel2' ? ordenacaoDetalhamento.direcao : '') + '">Nível 2</th>' : ''}
+                                    ${colunasVisiveis.nivel3 ? '<th onclick="ordenarDetalhamento(\'nivel3\')" class="sortable ' + (ordenacaoDetalhamento.coluna === 'nivel3' ? ordenacaoDetalhamento.direcao : '') + '">Nível 3</th>' : ''}
+                                    ${colunasVisiveis.item ? '<th onclick="ordenarDetalhamento(\'item\')" class="sortable ' + (ordenacaoDetalhamento.coluna === 'item' ? ordenacaoDetalhamento.direcao : '') + '">Item</th>' : ''}
+                                    ${colunasVisiveis.subitem ? '<th onclick="ordenarDetalhamento(\'subitem\')" class="sortable ' + (ordenacaoDetalhamento.coluna === 'subitem' ? ordenacaoDetalhamento.direcao : '') + '">Subitem</th>' : ''}
+                                    ${colunasVisiveis.previstoInicial ? '<th onclick="ordenarDetalhamento(\'previsto\')" class="sortable text-right ' + (ordenacaoDetalhamento.coluna === 'previsto' ? ordenacaoDetalhamento.direcao : '') + '">Previsto Inicial</th>' : ''}
+                                    ${colunasVisiveis.previstoAtualizado ? '<th onclick="ordenarDetalhamento(\'previstoAtualizado\')" class="sortable text-right ' + (ordenacaoDetalhamento.coluna === 'previstoAtualizado' ? ordenacaoDetalhamento.direcao : '') + '">Previsto Atualizado</th>' : ''}
+                                    ${colunasVisiveis.contabilizado ? '<th onclick="ordenarDetalhamento(\'contabilizado\')" class="sortable text-right ' + (ordenacaoDetalhamento.coluna === 'contabilizado' ? ordenacaoDetalhamento.direcao : '') + '">Contabilizado</th>' : ''}
+                                    ${colunasVisiveis.percentual ? '<th onclick="ordenarDetalhamento(\'percentual\')" class="sortable text-center ' + (ordenacaoDetalhamento.coluna === 'percentual' ? ordenacaoDetalhamento.direcao : '') + '">%</th>' : ''}
+                                    ${colunasVisiveis.acoes ? '<th class="text-center">Ações</th>' : ''}
                                 </tr>
                             </thead>
                             <tbody>
@@ -1681,12 +1838,12 @@
                             </tbody>
                             <tfoot class="table-footer">
                                 <tr>
-                                    <td colspan="6" class="fw-bold">TOTAL GERAL</td>
-                                    <td class="text-right fw-bold">${formatarMoeda(totalPrevistoGeral)}</td>
-                                    <td class="text-right fw-bold">${formatarMoeda(totalPrevistoAtualizadoGeral)}</td>
-                                    <td class="text-right fw-bold">${formatarMoeda(totalContabilizadoGeral)}</td>
-                                    <td class="text-center fw-bold">${percentualGeral}%</td>
-                                    <td></td>
+                                    <td colspan="${Object.values(colunasVisiveis).filter(Boolean).length - 3}" class="fw-bold">TOTAL GERAL</td>
+                                    ${colunasVisiveis.previstoInicial ? '<td class="text-right fw-bold">' + formatarMoeda(totalPrevistoGeral) + '</td>' : ''}
+                                    ${colunasVisiveis.previstoAtualizado ? '<td class="text-right fw-bold">' + formatarMoeda(totalPrevistoAtualizadoGeral) + '</td>' : ''}
+                                    ${colunasVisiveis.contabilizado ? '<td class="text-right fw-bold">' + formatarMoeda(totalContabilizadoGeral) + '</td>' : ''}
+                                    ${colunasVisiveis.percentual ? '<td class="text-center fw-bold">' + percentualGeral + '%</td>' : ''}
+                                    ${colunasVisiveis.acoes ? '<td></td>' : ''}
                                 </tr>
                             </tfoot>
                         </table>
@@ -1725,48 +1882,125 @@
 
         function gerarLinhasTabelaDetalhamento(dados) {
             if (!dados || dados.length === 0) {
-                return '<tr><td colspan="11" class="text-center py-4">Nenhum dado encontrado</td></tr>';
+                const colspan = Object.values(colunasVisiveis).filter(Boolean).length;
+                return `<tr><td colspan="${colspan}" class="text-center py-4">Nenhum dado encontrado</td></tr>`;
             }
             
             return dados.map(item => {
                 const percentual = calcularPercentual(item.valor_contabilizado, item.valor_previsto_inicial);
-                return `<tr>
-                    <td>${item.unidade_orcamentaria_nome || '-'}</td>
-                    <td>${item.classificacao_receita_formatado ? item.classificacao_receita_formatado.substring(0,30) + '...' : '-'}</td>
-                    <td><span class="badge-categoria ${getCategoriaBadgeClass(item.categoria_receita_descricao)}">${item.categoria_receita_descricao || '-'}</span></td>
-                    <td>${item.origem_receita_descricao || '-'}</td>
-                    <td>${item.especie_receita_descricao || '-'}</td>
-                    <td>${item.tipo_receita_descricao || '-'}</td>
-                    <td class="text-right">${formatarMoeda(item.valor_previsto_inicial)}</td>
-                    <td class="text-right">${formatarMoeda(item.valor_previsto_atualizado)}</td>
-                    <td class="text-right">${formatarMoeda(item.valor_contabilizado)}</td>
-                    <td class="text-center">
+                
+                let linha = '<tr>';
+                
+                if (colunasVisiveis.orgao) {
+                    linha += `<td>${item.unidade_orcamentaria_nome || '-'}</td>`;
+                }
+                
+                if (colunasVisiveis.classificacao) {
+                    linha += `<td>${item.classificacao_receita_formatado ? item.classificacao_receita_formatado.substring(0,30) + '...' : '-'}</td>`;
+                }
+                
+                if (colunasVisiveis.categoria) {
+                    const categoria = mostrarCodigos ? (item.categoria_receita_codigo || '-') : (item.categoria_receita_descricao || '-');
+                    linha += `<td><span class="badge-categoria ${getCategoriaBadgeClass(item.categoria_receita_descricao)}">${categoria}</span></td>`;
+                }
+                
+                if (colunasVisiveis.fonte) {
+                    const fonte = mostrarCodigos ? (item.fonte_recurso_codigo || '-') : (item.fonte_recurso_descricao || '-');
+                    linha += `<td>${fonte}</td>`;
+                }
+                
+                if (colunasVisiveis.origem) {
+                    const origem = mostrarCodigos ? (item.origem_receita_codigo || '-') : (item.origem_receita_descricao || '-');
+                    linha += `<td>${origem}</td>`;
+                }
+                
+                if (colunasVisiveis.especie) {
+                    const especie = mostrarCodigos ? (item.especie_receita_codigo || '-') : (item.especie_receita_descricao || '-');
+                    linha += `<td>${especie}</td>`;
+                }
+                
+                if (colunasVisiveis.nivel1) {
+                    const nivel1 = mostrarCodigos ? (item.nivel_1_desdobramento_codigo || '-') : (item.nivel_1_desdobramento_descricao || '-');
+                    linha += `<td>${nivel1}</td>`;
+                }
+                
+                if (colunasVisiveis.nivel2) {
+                    const nivel2 = mostrarCodigos ? (item.nivel_2_desdobramento_codigo || '-') : (item.nivel_2_desdobramento_descricao || '-');
+                    linha += `<td>${nivel2}</td>`;
+                }
+                
+                if (colunasVisiveis.nivel3) {
+                    const nivel3 = mostrarCodigos ? (item.nivel_3_desdobramento_codigo || '-') : (item.nivel_3_desdobramento_descricao || '-');
+                    linha += `<td>${nivel3}</td>`;
+                }
+                
+                if (colunasVisiveis.item) {
+                    const itemDesc = mostrarCodigos ? (item.item_receita_codigo || '-') : (item.item_receita_descricao || '-');
+                    linha += `<td>${itemDesc}</td>`;
+                }
+                
+                if (colunasVisiveis.subitem) {
+                    const subitem = mostrarCodigos ? (item.subitem_receita_codigo || '-') : (item.subitem_receita_descricao || '-');
+                    linha += `<td>${subitem}</td>`;
+                }
+                
+                if (colunasVisiveis.previstoInicial) {
+                    linha += `<td class="text-right">${formatarMoeda(item.valor_previsto_inicial)}</td>`;
+                }
+                
+                if (colunasVisiveis.previstoAtualizado) {
+                    linha += `<td class="text-right">${formatarMoeda(item.valor_previsto_atualizado)}</td>`;
+                }
+                
+                if (colunasVisiveis.contabilizado) {
+                    linha += `<td class="text-right">${formatarMoeda(item.valor_contabilizado)}</td>`;
+                }
+                
+                if (colunasVisiveis.percentual) {
+                    linha += `<td class="text-center">
                         <span class="badge ${parseFloat(percentual) >= 100 ? 'bg-success' : parseFloat(percentual) >= 90 ? 'bg-warning' : 'bg-danger'} text-white px-2 py-1">
                             ${percentual}%
                         </span>
-                    </td>
-                    <td class="text-center">
+                    </td>`;
+                }
+                
+                if (colunasVisiveis.acoes) {
+                    linha += `<td class="text-center">
                         <button class="btn-action" onclick='abrirModalDetalhes(${JSON.stringify([item]).replace(/'/g, "\\'")})' title="Ver detalhes">
                             <i class="material-icons">visibility</i>
                         </button>
-                    </td>
-                </tr>`;
+                    </td>`;
+                }
+                
+                linha += '</tr>';
+                return linha;
             }).join('');
         }
+
+        window.toggleColuna = function(coluna) {
+            colunasVisiveis[coluna] = !colunasVisiveis[coluna];
+            renderizarDetalhamento();
+        };
+
+        window.toggleCodigos = function() {
+            mostrarCodigos = !mostrarCodigos;
+            renderizarDetalhamento();
+        };
 
         window.aplicarFiltrosDetalhamento = function() {
             filtrosDetalhamento.ano = document.getElementById('filtroAnoDetalhamento')?.value || '';
             filtrosDetalhamento.orgao = document.getElementById('filtroOrgaoDetalhamento')?.value || '';
             filtrosDetalhamento.classificacao = document.getElementById('filtroClassificacaoDetalhamento')?.value || '';
             filtrosDetalhamento.categoria = document.getElementById('filtroCategoriaDetalhamento')?.value || '';
+            filtrosDetalhamento.fonte = document.getElementById('filtroFonteDetalhamento')?.value || '';
             filtrosDetalhamento.origem = document.getElementById('filtroOrigemDetalhamento')?.value || '';
             filtrosDetalhamento.especie = document.getElementById('filtroEspecieDetalhamento')?.value || '';
             filtrosDetalhamento.tipo = document.getElementById('filtroTipoDetalhamento')?.value || '';
-            filtrosDetalhamento.item = document.getElementById('filtroItemDetalhamento')?.value || '';
-            filtrosDetalhamento.subitem = document.getElementById('filtroSubitemDetalhamento')?.value || '';
             filtrosDetalhamento.nivel1 = document.getElementById('filtroNivel1Detalhamento')?.value || '';
             filtrosDetalhamento.nivel2 = document.getElementById('filtroNivel2Detalhamento')?.value || '';
             filtrosDetalhamento.nivel3 = document.getElementById('filtroNivel3Detalhamento')?.value || '';
+            filtrosDetalhamento.item = document.getElementById('filtroItemDetalhamento')?.value || '';
+            filtrosDetalhamento.subitem = document.getElementById('filtroSubitemDetalhamento')?.value || '';
             buscaDetalhamento = document.getElementById('buscaDetalhamento')?.value || '';
             paginaAtual.detalhamento = 1;
             renderizarDetalhamento();
@@ -1784,7 +2018,7 @@
             const anos = [...new Set(dadosCompletos.map(i => i.ano_de_exercicio))].filter(Boolean).sort();
             filtrosDetalhamento = { 
                 ano: anos.length > 0 ? anos[anos.length - 1] : '', 
-                orgao: '', classificacao: '', categoria: '', origem: '', especie: '', tipo: '',
+                orgao: '', classificacao: '', categoria: '', fonte: '', origem: '', especie: '', tipo: '',
                 item: '', subitem: '', nivel1: '', nivel2: '', nivel3: ''
             };
             buscaDetalhamento = '';
@@ -1805,673 +2039,6 @@
         window.mudarPaginaDetalhamento = function(pagina) {
             paginaAtual.detalhamento = pagina;
             renderizarDetalhamento();
-        };
-
-        // ============================================
-        // CATEGORIA (Sem órgão na coluna)
-        // ============================================
-        function renderizarCategoria() {
-            const container = document.getElementById('categoria-content');
-            if (!container) return;
-            
-            const opcoes = getOpcoesFiltro();
-            
-            let dadosFiltrados = aplicarFiltros(dadosCompletos, filtrosCategoria);
-            dadosFiltrados = aplicarBusca(dadosFiltrados, buscaCategoria, [
-                'categoria_receita_descricao', 'origem_receita_descricao', 
-                'especie_receita_descricao', 'tipo_receita_descricao'
-            ]);
-            
-            // Agrupar por categoria, origem, espécie, tipo
-            const grupos = new Map();
-            
-            dadosFiltrados.forEach(item => {
-                const chave = `${item.categoria_receita_descricao}|${item.origem_receita_descricao}|${item.especie_receita_descricao}|${item.tipo_receita_descricao}`;
-                
-                if (!grupos.has(chave)) {
-                    grupos.set(chave, {
-                        categoria: item.categoria_receita_descricao || 'Não categorizado',
-                        origem: item.origem_receita_descricao || 'Não especificada',
-                        especie: item.especie_receita_descricao || 'Não especificada',
-                        tipo: item.tipo_receita_descricao || 'Não especificado',
-                        totalPrevisto: 0,
-                        totalPrevistoAtualizado: 0,
-                        totalContabilizado: 0,
-                        orgaos: new Set(),
-                        registros: []
-                    });
-                }
-                
-                const grupo = grupos.get(chave);
-                grupo.totalPrevisto += item.valor_previsto_inicial || 0;
-                grupo.totalPrevistoAtualizado += item.valor_previsto_atualizado || 0;
-                grupo.totalContabilizado += item.valor_contabilizado || 0;
-                grupo.orgaos.add(item.unidade_orcamentaria_nome);
-                grupo.registros.push(item);
-            });
-            
-            let dadosTabela = Array.from(grupos.values());
-            
-            const totalPrevistoGeral = dadosTabela.reduce((acc, i) => acc + i.totalPrevisto, 0);
-            const totalPrevistoAtualizadoGeral = dadosTabela.reduce((acc, i) => acc + i.totalPrevistoAtualizado, 0);
-            const totalContabilizadoGeral = dadosTabela.reduce((acc, i) => acc + i.totalContabilizado, 0);
-            const percentualGeral = calcularPercentual(totalContabilizadoGeral, totalPrevistoGeral);
-            
-            // Ordenação
-            dadosTabela.sort((a, b) => {
-                let valA, valB;
-                switch(ordenacaoCategoria.coluna) {
-                    case 'categoria':
-                        valA = a.categoria || '';
-                        valB = b.categoria || '';
-                        break;
-                    case 'origem':
-                        valA = a.origem || '';
-                        valB = b.origem || '';
-                        break;
-                    case 'especie':
-                        valA = a.especie || '';
-                        valB = b.especie || '';
-                        break;
-                    case 'tipo':
-                        valA = a.tipo || '';
-                        valB = b.tipo || '';
-                        break;
-                    case 'previsto':
-                        valA = a.totalPrevisto;
-                        valB = b.totalPrevisto;
-                        break;
-                    case 'previstoAtualizado':
-                        valA = a.totalPrevistoAtualizado;
-                        valB = b.totalPrevistoAtualizado;
-                        break;
-                    case 'contabilizado':
-                        valA = a.totalContabilizado;
-                        valB = b.totalContabilizado;
-                        break;
-                    case 'percentual':
-                        valA = (a.totalContabilizado / a.totalPrevisto) || 0;
-                        valB = (b.totalContabilizado / b.totalPrevisto) || 0;
-                        break;
-                    default:
-                        valA = a.categoria || '';
-                        valB = b.categoria || '';
-                }
-                
-                if (ordenacaoCategoria.direcao === 'asc') {
-                    return valA > valB ? 1 : -1;
-                } else {
-                    return valA < valB ? 1 : -1;
-                }
-            });
-            
-            const totalRegistros = dadosTabela.length;
-            const totalPaginas = Math.ceil(totalRegistros / itensPorPagina);
-            const inicio = (paginaAtual.categoria - 1) * itensPorPagina;
-            const dadosPagina = dadosTabela.slice(inicio, inicio + itensPorPagina);
-            
-            let html = `
-                <div class="filter-container">
-                    <div class="row g-3">
-                        <div class="col-md-2">
-                            <label class="filter-label"><i class="material-icons">calendar_today</i>Ano</label>
-                            <select class="form-select" id="filtroAnoCategoria">
-                                <option value="">Selecione um ano</option>
-                                ${opcoes.anos.map(a => `<option value="${a}" ${filtrosCategoria.ano === a ? 'selected' : ''}>${a}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="filter-label"><i class="material-icons">category</i>Categoria</label>
-                            <select class="form-select" id="filtroCategoria">
-                                <option value="">Todas</option>
-                                ${opcoes.categorias.map(c => `<option value="${c}" ${filtrosCategoria.categoria === c ? 'selected' : ''}>${c}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="filter-label"><i class="material-icons">source</i>Origem</label>
-                            <select class="form-select" id="filtroOrigemCategoria">
-                                <option value="">Todas</option>
-                                ${opcoes.origens.map(o => `<option value="${o}" ${filtrosCategoria.origem === o ? 'selected' : ''}>${o}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="filter-label"><i class="material-icons">list</i>Espécie</label>
-                            <select class="form-select" id="filtroEspecieCategoria">
-                                <option value="">Todas</option>
-                                ${opcoes.especies.map(e => `<option value="${e}" ${filtrosCategoria.especie === e ? 'selected' : ''}>${e}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="filter-label"><i class="material-icons">format_list_bulleted</i>Tipo</label>
-                            <select class="form-select" id="filtroTipoCategoria">
-                                <option value="">Todos</option>
-                                ${opcoes.tipos.map(t => `<option value="${t}" ${filtrosCategoria.tipo === t ? 'selected' : ''}>${t}</option>`).join('')}
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="row mt-3">
-                        <div class="col-12 d-flex justify-content-end gap-2">
-                            <button class="btn-search" onclick="aplicarFiltrosCategoria()">
-                                <i class="material-icons">search</i> Pesquisar
-                            </button>
-                            <button class="btn-secondary-custom" onclick="limparFiltrosCategoria()">
-                                <i class="material-icons me-2">clear</i>Limpar filtros
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="action-bar">
-                    <div class="d-flex align-items-center">
-                        <span class="table-badge">Total de registros: ${totalRegistros.toLocaleString('pt-BR')}</span>
-                    </div>
-                    <div class="action-group">
-                        <input type="text" class="search-box" id="buscaCategoria" placeholder="Buscar..." value="${buscaCategoria}" onkeyup="buscaCategoriaChange(this.value)">
-                        <button class="btn-export" onclick="exportarCategoriaCSV()"><i class="material-icons me-2">description</i>CSV</button>
-                        <button class="btn-export" onclick="exportarCategoriaPDF()"><i class="material-icons me-2">print</i>PDF</button>
-                        <div class="share-dropdown">
-                            <button class="btn-export" onclick="toggleShare('categoria')"><i class="material-icons me-2">share</i>Compartilhar</button>
-                            <div class="share-options" id="shareOptions-categoria">
-                                <a href="#" onclick="copiarLink(event, 'categoria')"><i class="fas fa-link"></i> Copiar Link</a>
-                                <a href="#" onclick="compartilharFacebook(event, 'categoria')"><i class="fab fa-facebook-f"></i> Facebook</a>
-                                <a href="#" onclick="compartilharTwitter(event, 'categoria')"><i class="fab fa-twitter"></i> Twitter</a>
-                                <a href="#" onclick="compartilharLinkedIn(event, 'categoria')"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
-                                <a href="#" onclick="compartilharWhatsApp(event, 'categoria')"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="table-container">
-                    <div class="table-fixed-header-container">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th onclick="ordenarCategoria('categoria')" class="sortable ${ordenacaoCategoria.coluna === 'categoria' ? ordenacaoCategoria.direcao : ''}">Categoria</th>
-                                    <th onclick="ordenarCategoria('origem')" class="sortable ${ordenacaoCategoria.coluna === 'origem' ? ordenacaoCategoria.direcao : ''}">Origem</th>
-                                    <th onclick="ordenarCategoria('especie')" class="sortable ${ordenacaoCategoria.coluna === 'especie' ? ordenacaoCategoria.direcao : ''}">Espécie</th>
-                                    <th onclick="ordenarCategoria('tipo')" class="sortable ${ordenacaoCategoria.coluna === 'tipo' ? ordenacaoCategoria.direcao : ''}">Tipo</th>
-                                    <th onclick="ordenarCategoria('previsto')" class="sortable text-right ${ordenacaoCategoria.coluna === 'previsto' ? ordenacaoCategoria.direcao : ''}">Previsto Inicial</th>
-                                    <th onclick="ordenarCategoria('previstoAtualizado')" class="sortable text-right ${ordenacaoCategoria.coluna === 'previstoAtualizado' ? ordenacaoCategoria.direcao : ''}">Previsto Atualizado</th>
-                                    <th onclick="ordenarCategoria('contabilizado')" class="sortable text-right ${ordenacaoCategoria.coluna === 'contabilizado' ? ordenacaoCategoria.direcao : ''}">Contabilizado</th>
-                                    <th onclick="ordenarCategoria('percentual')" class="sortable text-center ${ordenacaoCategoria.coluna === 'percentual' ? ordenacaoCategoria.direcao : ''}">%</th>
-                                    <th class="text-center">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${gerarLinhasTabelaCategoria(dadosPagina)}
-                            </tbody>
-                            <tfoot class="table-footer">
-                                <tr>
-                                    <td colspan="4" class="fw-bold">TOTAL GERAL</td>
-                                    <td class="text-right fw-bold">${formatarMoeda(totalPrevistoGeral)}</td>
-                                    <td class="text-right fw-bold">${formatarMoeda(totalPrevistoAtualizadoGeral)}</td>
-                                    <td class="text-right fw-bold">${formatarMoeda(totalContabilizadoGeral)}</td>
-                                    <td class="text-center fw-bold">${percentualGeral}%</td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                    
-                    <div class="pagination-container">
-                        <div class="pagination-info">
-                            Mostrando ${inicio+1}-${Math.min(inicio+itensPorPagina, totalRegistros)} de ${totalRegistros.toLocaleString('pt-BR')} registros
-                        </div>
-                        <nav>
-                            <ul class="pagination mb-0">
-                                <li class="page-item ${paginaAtual.categoria === 1 ? 'disabled' : ''}">
-                                    <a class="page-link" href="#" onclick="mudarPaginaCategoria(${paginaAtual.categoria - 1}); return false;">&laquo;</a>
-                                </li>
-                                ${Array.from({ length: Math.min(5, totalPaginas) }, (_, i) => {
-                                    let inicioPaginas = Math.max(1, Math.min(paginaAtual.categoria - 2, totalPaginas - 4));
-                                    let num = inicioPaginas + i;
-                                    if (num <= totalPaginas) {
-                                        return `<li class="page-item ${num === paginaAtual.categoria ? 'active' : ''}">
-                                            <a class="page-link" href="#" onclick="mudarPaginaCategoria(${num}); return false;">${num}</a>
-                                        </li>`;
-                                    }
-                                    return '';
-                                }).join('')}
-                                <li class="page-item ${paginaAtual.categoria === totalPaginas ? 'disabled' : ''}">
-                                    <a class="page-link" href="#" onclick="mudarPaginaCategoria(${paginaAtual.categoria + 1}); return false;">&raquo;</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            `;
-            
-            container.innerHTML = html;
-        }
-
-        function gerarLinhasTabelaCategoria(dados) {
-            if (!dados || dados.length === 0) {
-                return '<tr><td colspan="9" class="text-center py-4">Nenhum dado encontrado</td></tr>';
-            }
-            
-            return dados.map(item => {
-                const percentual = calcularPercentual(item.totalContabilizado, item.totalPrevisto);
-                const orgaosLista = Array.from(item.orgaos).join(', ');
-                
-                return `<tr>
-                    <td><span class="badge-categoria ${getCategoriaBadgeClass(item.categoria)}">${item.categoria}</span></td>
-                    <td>${item.origem}</td>
-                    <td>${item.especie}</td>
-                    <td>${item.tipo}</td>
-                    <td class="text-right">${formatarMoeda(item.totalPrevisto)}</td>
-                    <td class="text-right">${formatarMoeda(item.totalPrevistoAtualizado)}</td>
-                    <td class="text-right">${formatarMoeda(item.totalContabilizado)}</td>
-                    <td class="text-center">
-                        <span class="badge ${parseFloat(percentual) >= 100 ? 'bg-success' : parseFloat(percentual) >= 90 ? 'bg-warning' : 'bg-danger'} text-white px-2 py-1">
-                            ${percentual}%
-                        </span>
-                    </td>
-                    <td class="text-center">
-                        <button class="btn-action" onclick='abrirModalCategoria(${JSON.stringify(item.categoria)}, ${JSON.stringify(item.origem)}, ${JSON.stringify(item.especie)}, ${JSON.stringify(item.tipo)}, ${JSON.stringify(Array.from(item.orgaos))}, ${JSON.stringify(item.registros).replace(/'/g, "\\'")})' title="Ver detalhes">
-                            <i class="material-icons">visibility</i>
-                        </button>
-                    </td>
-                </tr>`;
-            }).join('');
-        }
-
-        window.abrirModalCategoria = function(categoria, origem, especie, tipo, orgaos, registros) {
-            let html = `
-                <div class="modal-ano">Detalhamento da Categoria</div>
-                <div class="modal-orgao">
-                    ${categoria}
-                </div>
-                
-                <div class="modal-resumo">
-                    <div class="modal-resumo-item">
-                        <div class="modal-resumo-label">Origem</div>
-                        <div class="modal-resumo-valor">${origem}</div>
-                    </div>
-                    <div class="modal-resumo-item">
-                        <div class="modal-resumo-label">Espécie</div>
-                        <div class="modal-resumo-valor">${especie}</div>
-                    </div>
-                    <div class="modal-resumo-item">
-                        <div class="modal-resumo-label">Tipo</div>
-                        <div class="modal-resumo-valor">${tipo}</div>
-                    </div>
-                </div>
-                
-                <div class="modal-subtitulo">Órgãos com Receita</div>
-                
-                <table class="modal-tabela-itens">
-                    <thead>
-                        <tr>
-                            <th>Órgão</th>
-                            <th>Previsto Inicial</th>
-                            <th>Previsto Atualizado</th>
-                            <th>Contabilizado</th>
-                            <th>%</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            // Agrupar por órgão
-            const orgaosMap = new Map();
-            registros.forEach(r => {
-                const nomeOrgao = r.unidade_orcamentaria_nome;
-                if (!orgaosMap.has(nomeOrgao)) {
-                    orgaosMap.set(nomeOrgao, {
-                        orgao: nomeOrgao,
-                        previsto: 0,
-                        previstoAtualizado: 0,
-                        contabilizado: 0
-                    });
-                }
-                const item = orgaosMap.get(nomeOrgao);
-                item.previsto += r.valor_previsto_inicial || 0;
-                item.previstoAtualizado += r.valor_previsto_atualizado || 0;
-                item.contabilizado += r.valor_contabilizado || 0;
-            });
-            
-            Array.from(orgaosMap.values()).forEach(item => {
-                const percentual = calcularPercentual(item.contabilizado, item.previsto);
-                html += `
-                    <tr>
-                        <td>${item.orgao}</td>
-                        <td class="modal-valor-previsto">${formatarMoeda(item.previsto)}</td>
-                        <td class="modal-valor-previsto">${formatarMoeda(item.previstoAtualizado)}</td>
-                        <td class="modal-valor-contabilizado">${formatarMoeda(item.contabilizado)}</td>
-                        <td>${percentual}%</td>
-                    </tr>
-                `;
-            });
-            
-            html += `
-                    </tbody>
-                </table>
-            `;
-            
-            document.getElementById('categoriaModalContent').innerHTML = html;
-            new bootstrap.Modal(document.getElementById('categoriaModal')).show();
-        };
-
-        window.aplicarFiltrosCategoria = function() {
-            filtrosCategoria.ano = document.getElementById('filtroAnoCategoria')?.value || '';
-            filtrosCategoria.categoria = document.getElementById('filtroCategoria')?.value || '';
-            filtrosCategoria.origem = document.getElementById('filtroOrigemCategoria')?.value || '';
-            filtrosCategoria.especie = document.getElementById('filtroEspecieCategoria')?.value || '';
-            filtrosCategoria.tipo = document.getElementById('filtroTipoCategoria')?.value || '';
-            buscaCategoria = document.getElementById('buscaCategoria')?.value || '';
-            paginaAtual.categoria = 1;
-            renderizarCategoria();
-        };
-
-        window.buscaCategoriaChange = function(valor) {
-            debounceBusca('categoria', valor, (v) => {
-                buscaCategoria = v;
-                paginaAtual.categoria = 1;
-                renderizarCategoria();
-            }, 500);
-        };
-
-        window.limparFiltrosCategoria = function() {
-            const anos = [...new Set(dadosCompletos.map(i => i.ano_de_exercicio))].filter(Boolean).sort();
-            filtrosCategoria = { 
-                ano: anos.length > 0 ? anos[anos.length - 1] : '', 
-                categoria: '', origem: '', especie: '', tipo: ''
-            };
-            buscaCategoria = '';
-            paginaAtual.categoria = 1;
-            renderizarCategoria();
-        };
-
-        window.ordenarCategoria = function(coluna) {
-            if (ordenacaoCategoria.coluna === coluna) {
-                ordenacaoCategoria.direcao = ordenacaoCategoria.direcao === 'asc' ? 'desc' : 'asc';
-            } else {
-                ordenacaoCategoria.coluna = coluna;
-                ordenacaoCategoria.direcao = 'asc';
-            }
-            renderizarCategoria();
-        };
-
-        window.mudarPaginaCategoria = function(pagina) {
-            paginaAtual.categoria = pagina;
-            renderizarCategoria();
-        };
-
-        // ============================================
-        // CLASSIFICAÇÃO (Mantida como estava)
-        // ============================================
-        function renderizarClassificacao() {
-            const container = document.getElementById('classificacao-content');
-            if (!container) return;
-            
-            const opcoes = getOpcoesFiltro();
-            
-            let dadosFiltrados = aplicarFiltros(dadosCompletos, filtrosClassificacao);
-            dadosFiltrados = aplicarBusca(dadosFiltrados, buscaClassificacao, [
-                'unidade_orcamentaria_nome', 'classificacao_receita_formatado'
-            ]);
-            
-            const agrupado = {};
-            dadosFiltrados.forEach(item => {
-                const chave = item.classificacao_receita_formatado;
-                if (!agrupado[chave]) {
-                    agrupado[chave] = {
-                        classificacao: item.classificacao_receita_formatado || 'Não classificada',
-                        totalPrevisto: 0,
-                        totalPrevistoAtualizado: 0,
-                        totalContabilizado: 0,
-                        orgaos: new Set(),
-                        registros: []
-                    };
-                }
-                agrupado[chave].totalPrevisto += item.valor_previsto_inicial || 0;
-                agrupado[chave].totalPrevistoAtualizado += item.valor_previsto_atualizado || 0;
-                agrupado[chave].totalContabilizado += item.valor_contabilizado || 0;
-                agrupado[chave].orgaos.add(item.unidade_orcamentaria_nome);
-                agrupado[chave].registros.push(item);
-            });
-            
-            let dadosTabela = Object.values(agrupado).map(item => ({
-                ...item,
-                orgaos_lista: Array.from(item.orgaos).join(', ')
-            }));
-            
-            const totalPrevistoGeral = dadosFiltrados.reduce((acc, i) => acc + (i.valor_previsto_inicial || 0), 0);
-            const totalPrevistoAtualizadoGeral = dadosFiltrados.reduce((acc, i) => acc + (i.valor_previsto_atualizado || 0), 0);
-            const totalContabilizadoGeral = dadosFiltrados.reduce((acc, i) => acc + (i.valor_contabilizado || 0), 0);
-            const percentualGeral = calcularPercentual(totalContabilizadoGeral, totalPrevistoGeral);
-            
-            dadosTabela.sort((a, b) => {
-                let valA, valB;
-                switch(ordenacaoClassificacao.coluna) {
-                    case 'classificacao':
-                        valA = a.classificacao || '';
-                        valB = b.classificacao || '';
-                        break;
-                    case 'previsto':
-                        valA = a.totalPrevisto;
-                        valB = b.totalPrevisto;
-                        break;
-                    case 'previstoAtualizado':
-                        valA = a.totalPrevistoAtualizado;
-                        valB = b.totalPrevistoAtualizado;
-                        break;
-                    case 'contabilizado':
-                        valA = a.totalContabilizado;
-                        valB = b.totalContabilizado;
-                        break;
-                    case 'percentual':
-                        valA = (a.totalContabilizado / a.totalPrevisto) || 0;
-                        valB = (b.totalContabilizado / b.totalPrevisto) || 0;
-                        break;
-                    default:
-                        valA = a.classificacao || '';
-                        valB = b.classificacao || '';
-                }
-                
-                if (ordenacaoClassificacao.direcao === 'asc') {
-                    return valA > valB ? 1 : -1;
-                } else {
-                    return valA < valB ? 1 : -1;
-                }
-            });
-            
-            const totalRegistros = dadosTabela.length;
-            const totalPaginas = Math.ceil(totalRegistros / itensPorPagina);
-            const inicio = (paginaAtual.classificacao - 1) * itensPorPagina;
-            const dadosPagina = dadosTabela.slice(inicio, inicio + itensPorPagina);
-            
-            let html = `
-                <div class="filter-container">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <label class="filter-label"><i class="material-icons">calendar_today</i>Ano</label>
-                            <select class="form-select" id="filtroAnoClassificacao">
-                                <option value="">Selecione um ano</option>
-                                ${opcoes.anos.map(a => `<option value="${a}" ${filtrosClassificacao.ano === a ? 'selected' : ''}>${a}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="filter-label"><i class="material-icons">business</i>Órgão</label>
-                            <select class="form-select" id="filtroOrgaoClassificacao">
-                                <option value="">Todos</option>
-                                ${opcoes.orgaos.map(o => `<option value="${o}" ${filtrosClassificacao.orgao === o ? 'selected' : ''}>${o}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="col-md-5">
-                            <label class="filter-label"><i class="material-icons">class</i>Classificação</label>
-                            <select class="form-select" id="filtroClassificacao">
-                                <option value="">Todas</option>
-                                ${opcoes.classificacoes.map(c => `<option value="${c}" ${filtrosClassificacao.classificacao === c ? 'selected' : ''}>${c.substring(0,60)}...</option>`).join('')}
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="row mt-3">
-                        <div class="col-12 d-flex justify-content-end gap-2">
-                            <button class="btn-search" onclick="aplicarFiltrosClassificacao()">
-                                <i class="material-icons">search</i> Pesquisar
-                            </button>
-                            <button class="btn-secondary-custom" onclick="limparFiltrosClassificacao()">
-                                <i class="material-icons me-2">clear</i>Limpar filtros
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="action-bar">
-                    <div class="d-flex align-items-center">
-                        <span class="table-badge">Total de registros: ${totalRegistros.toLocaleString('pt-BR')}</span>
-                    </div>
-                    <div class="action-group">
-                        <input type="text" class="search-box" id="buscaClassificacao" placeholder="Buscar..." value="${buscaClassificacao}" onkeyup="buscaClassificacaoChange(this.value)">
-                        <button class="btn-export" onclick="exportarClassificacaoCSV()"><i class="material-icons me-2">description</i>CSV</button>
-                        <button class="btn-export" onclick="exportarClassificacaoPDF()"><i class="material-icons me-2">print</i>PDF</button>
-                        <div class="share-dropdown">
-                            <button class="btn-export" onclick="toggleShare('classificacao')"><i class="material-icons me-2">share</i>Compartilhar</button>
-                            <div class="share-options" id="shareOptions-classificacao">
-                                <a href="#" onclick="copiarLink(event, 'classificacao')"><i class="fas fa-link"></i> Copiar Link</a>
-                                <a href="#" onclick="compartilharFacebook(event, 'classificacao')"><i class="fab fa-facebook-f"></i> Facebook</a>
-                                <a href="#" onclick="compartilharTwitter(event, 'classificacao')"><i class="fab fa-twitter"></i> Twitter</a>
-                                <a href="#" onclick="compartilharLinkedIn(event, 'classificacao')"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
-                                <a href="#" onclick="compartilharWhatsApp(event, 'classificacao')"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="table-container">
-                    <div class="table-fixed-header-container">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th onclick="ordenarClassificacao('classificacao')" class="sortable ${ordenacaoClassificacao.coluna === 'classificacao' ? ordenacaoClassificacao.direcao : ''}">Classificação da Receita</th>
-                                    <th>Órgãos com Receita</th>
-                                    <th onclick="ordenarClassificacao('previsto')" class="sortable text-right ${ordenacaoClassificacao.coluna === 'previsto' ? ordenacaoClassificacao.direcao : ''}">Previsto Inicial</th>
-                                    <th onclick="ordenarClassificacao('previstoAtualizado')" class="sortable text-right ${ordenacaoClassificacao.coluna === 'previstoAtualizado' ? ordenacaoClassificacao.direcao : ''}">Previsto Atualizado</th>
-                                    <th onclick="ordenarClassificacao('contabilizado')" class="sortable text-right ${ordenacaoClassificacao.coluna === 'contabilizado' ? ordenacaoClassificacao.direcao : ''}">Contabilizado</th>
-                                    <th onclick="ordenarClassificacao('percentual')" class="sortable text-center ${ordenacaoClassificacao.coluna === 'percentual' ? ordenacaoClassificacao.direcao : ''}">%</th>
-                                    <th class="text-center">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${gerarLinhasTabelaClassificacao(dadosPagina)}
-                            </tbody>
-                            <tfoot class="table-footer">
-                                <tr>
-                                    <td colspan="2" class="fw-bold">TOTAL GERAL</td>
-                                    <td class="text-right fw-bold">${formatarMoeda(totalPrevistoGeral)}</td>
-                                    <td class="text-right fw-bold">${formatarMoeda(totalPrevistoAtualizadoGeral)}</td>
-                                    <td class="text-right fw-bold">${formatarMoeda(totalContabilizadoGeral)}</td>
-                                    <td class="text-center fw-bold">${percentualGeral}%</td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                    
-                    <div class="pagination-container">
-                        <div class="pagination-info">
-                            Mostrando ${inicio+1}-${Math.min(inicio+itensPorPagina, totalRegistros)} de ${totalRegistros.toLocaleString('pt-BR')} registros
-                        </div>
-                        <nav>
-                            <ul class="pagination mb-0">
-                                <li class="page-item ${paginaAtual.classificacao === 1 ? 'disabled' : ''}">
-                                    <a class="page-link" href="#" onclick="mudarPaginaClassificacao(${paginaAtual.classificacao - 1}); return false;">&laquo;</a>
-                                </li>
-                                ${Array.from({ length: Math.min(5, totalPaginas) }, (_, i) => {
-                                    let inicioPaginas = Math.max(1, Math.min(paginaAtual.classificacao - 2, totalPaginas - 4));
-                                    let num = inicioPaginas + i;
-                                    if (num <= totalPaginas) {
-                                        return `<li class="page-item ${num === paginaAtual.classificacao ? 'active' : ''}">
-                                            <a class="page-link" href="#" onclick="mudarPaginaClassificacao(${num}); return false;">${num}</a>
-                                        </li>`;
-                                    }
-                                    return '';
-                                }).join('')}
-                                <li class="page-item ${paginaAtual.classificacao === totalPaginas ? 'disabled' : ''}">
-                                    <a class="page-link" href="#" onclick="mudarPaginaClassificacao(${paginaAtual.classificacao + 1}); return false;">&raquo;</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            `;
-            
-            container.innerHTML = html;
-        }
-
-        function gerarLinhasTabelaClassificacao(dados) {
-            if (!dados || dados.length === 0) {
-                return '<tr><td colspan="7" class="text-center py-4">Nenhum dado encontrado</td></tr>';
-            }
-            
-            return dados.map(item => {
-                const percentual = calcularPercentual(item.totalContabilizado, item.totalPrevisto);
-                return `<tr>
-                    <td>${item.classificacao}</td>
-                    <td>${item.orgaos_lista.substring(0,50)}...</td>
-                    <td class="text-right">${formatarMoeda(item.totalPrevisto)}</td>
-                    <td class="text-right">${formatarMoeda(item.totalPrevistoAtualizado)}</td>
-                    <td class="text-right">${formatarMoeda(item.totalContabilizado)}</td>
-                    <td class="text-center">
-                        <span class="badge ${parseFloat(percentual) >= 100 ? 'bg-success' : parseFloat(percentual) >= 90 ? 'bg-warning' : 'bg-danger'} text-white px-2 py-1">
-                            ${percentual}%
-                        </span>
-                    </td>
-                    <td class="text-center">
-                        <button class="btn-action" onclick='abrirModalDetalhes(${JSON.stringify(item.registros).replace(/'/g, "\\'")})' title="Ver detalhes">
-                            <i class="material-icons">visibility</i>
-                        </button>
-                    </td>
-                </tr>`;
-            }).join('');
-        }
-
-        window.aplicarFiltrosClassificacao = function() {
-            filtrosClassificacao.ano = document.getElementById('filtroAnoClassificacao')?.value || '';
-            filtrosClassificacao.orgao = document.getElementById('filtroOrgaoClassificacao')?.value || '';
-            filtrosClassificacao.classificacao = document.getElementById('filtroClassificacao')?.value || '';
-            buscaClassificacao = document.getElementById('buscaClassificacao')?.value || '';
-            paginaAtual.classificacao = 1;
-            renderizarClassificacao();
-        };
-
-        window.buscaClassificacaoChange = function(valor) {
-            debounceBusca('classificacao', valor, (v) => {
-                buscaClassificacao = v;
-                paginaAtual.classificacao = 1;
-                renderizarClassificacao();
-            }, 500);
-        };
-
-        window.limparFiltrosClassificacao = function() {
-            const anos = [...new Set(dadosCompletos.map(i => i.ano_de_exercicio))].filter(Boolean).sort();
-            filtrosClassificacao = { 
-                ano: anos.length > 0 ? anos[anos.length - 1] : '', 
-                orgao: '', 
-                classificacao: '' 
-            };
-            buscaClassificacao = '';
-            paginaAtual.classificacao = 1;
-            renderizarClassificacao();
-        };
-
-        window.ordenarClassificacao = function(coluna) {
-            if (ordenacaoClassificacao.coluna === coluna) {
-                ordenacaoClassificacao.direcao = ordenacaoClassificacao.direcao === 'asc' ? 'desc' : 'asc';
-            } else {
-                ordenacaoClassificacao.coluna = coluna;
-                ordenacaoClassificacao.direcao = 'asc';
-            }
-            renderizarClassificacao();
-        };
-
-        window.mudarPaginaClassificacao = function(pagina) {
-            paginaAtual.classificacao = pagina;
-            renderizarClassificacao();
         };
 
         // ============================================
@@ -2510,6 +2077,10 @@
                     <div class="modal-resumo-item">
                         <div class="modal-resumo-label">Categoria</div>
                         <div class="modal-resumo-valor">${primeiro.categoria_receita_descricao || '-'}</div>
+                    </div>
+                    <div class="modal-resumo-item">
+                        <div class="modal-resumo-label">Fonte</div>
+                        <div class="modal-resumo-valor">${primeiro.fonte_recurso_descricao || '-'}</div>
                     </div>
                     <div class="modal-resumo-item">
                         <div class="modal-resumo-label">Origem</div>
@@ -2727,166 +2298,40 @@
             let dadosFiltrados = aplicarFiltros(dadosCompletos, filtrosDetalhamento);
             dadosFiltrados = aplicarBusca(dadosFiltrados, buscaDetalhamento, [
                 'unidade_orcamentaria_nome', 'classificacao_receita_formatado', 'categoria_receita_descricao',
-                'origem_receita_descricao', 'especie_receita_descricao', 'tipo_receita_descricao'
+                'fonte_recurso_descricao', 'origem_receita_descricao', 'especie_receita_descricao', 'tipo_receita_descricao',
+                'nivel_1_desdobramento_descricao', 'nivel_2_desdobramento_descricao', 'nivel_3_desdobramento_descricao',
+                'item_receita_descricao', 'subitem_receita_descricao'
             ]);
             
-            const cabecalhos = ['Órgão', 'Classificação', 'Categoria', 'Origem', 'Espécie', 'Tipo', 'Previsto Inicial', 'Previsto Atualizado', 'Contabilizado'];
-            const mapeamento = ['unidade_orcamentaria_nome', 'classificacao_receita_formatado', 'categoria_receita_descricao', 'origem_receita_descricao', 'especie_receita_descricao', 'tipo_receita_descricao', 'valor_previsto_inicial', 'valor_previsto_atualizado', 'valor_contabilizado'];
+            const cabecalhos = ['Órgão', 'Classificação', 'Categoria', 'Fonte', 'Origem', 'Espécie', 'Tipo', 'Nível 1', 'Nível 2', 'Nível 3', 'Item', 'Subitem', 'Previsto Inicial', 'Previsto Atualizado', 'Contabilizado'];
+            const mapeamento = [
+                'unidade_orcamentaria_nome', 'classificacao_receita_formatado', 'categoria_receita_descricao',
+                'fonte_recurso_descricao', 'origem_receita_descricao', 'especie_receita_descricao', 'tipo_receita_descricao',
+                'nivel_1_desdobramento_descricao', 'nivel_2_desdobramento_descricao', 'nivel_3_desdobramento_descricao',
+                'item_receita_descricao', 'subitem_receita_descricao', 'valor_previsto_inicial', 'valor_previsto_atualizado', 'valor_contabilizado'
+            ];
             
-            exportarParaCSV(dadosFiltrados, 'detalhamento.csv', cabecalhos, mapeamento);
+            exportarParaCSV(dadosFiltrados, 'detalhamento_completo.csv', cabecalhos, mapeamento);
         };
 
         window.exportarDetalhamentoPDF = function() {
             let dadosFiltrados = aplicarFiltros(dadosCompletos, filtrosDetalhamento);
             dadosFiltrados = aplicarBusca(dadosFiltrados, buscaDetalhamento, [
                 'unidade_orcamentaria_nome', 'classificacao_receita_formatado', 'categoria_receita_descricao',
-                'origem_receita_descricao', 'especie_receita_descricao', 'tipo_receita_descricao'
+                'fonte_recurso_descricao', 'origem_receita_descricao', 'especie_receita_descricao', 'tipo_receita_descricao',
+                'nivel_1_desdobramento_descricao', 'nivel_2_desdobramento_descricao', 'nivel_3_desdobramento_descricao',
+                'item_receita_descricao', 'subitem_receita_descricao'
             ]);
             
-            const colunas = ['Órgão', 'Classificação', 'Categoria', 'Origem', 'Espécie', 'Tipo', 'Prev Inic', 'Prev Atual', 'Contab'];
-            const mapeamento = ['unidade_orcamentaria_nome', 'classificacao_receita_formatado', 'categoria_receita_descricao', 'origem_receita_descricao', 'especie_receita_descricao', 'tipo_receita_descricao', 'valor_previsto_inicial', 'valor_previsto_atualizado', 'valor_contabilizado'];
+            const colunas = ['Órgão', 'Classificação', 'Categoria', 'Fonte', 'Origem', 'Espécie', 'Tipo', 'Nível 1', 'Nível 2', 'Nível 3', 'Item', 'Subitem', 'Prev Inic', 'Prev Atual', 'Contab'];
+            const mapeamento = [
+                'unidade_orcamentaria_nome', 'classificacao_receita_formatado', 'categoria_receita_descricao',
+                'fonte_recurso_descricao', 'origem_receita_descricao', 'especie_receita_descricao', 'tipo_receita_descricao',
+                'nivel_1_desdobramento_descricao', 'nivel_2_desdobramento_descricao', 'nivel_3_desdobramento_descricao',
+                'item_receita_descricao', 'subitem_receita_descricao', 'valor_previsto_inicial', 'valor_previsto_atualizado', 'valor_contabilizado'
+            ];
             
-            exportarParaPDF(dadosFiltrados, 'Detalhamento da Receita', colunas, mapeamento, 'detalhamento.pdf');
-        };
-
-        window.exportarCategoriaCSV = function() {
-            let dadosFiltrados = aplicarFiltros(dadosCompletos, filtrosCategoria);
-            dadosFiltrados = aplicarBusca(dadosFiltrados, buscaCategoria, [
-                'categoria_receita_descricao', 'origem_receita_descricao', 
-                'especie_receita_descricao', 'tipo_receita_descricao'
-            ]);
-            
-            const grupos = new Map();
-            dadosFiltrados.forEach(item => {
-                const chave = `${item.categoria_receita_descricao}|${item.origem_receita_descricao}|${item.especie_receita_descricao}|${item.tipo_receita_descricao}`;
-                
-                if (!grupos.has(chave)) {
-                    grupos.set(chave, {
-                        categoria: item.categoria_receita_descricao || 'Não categorizado',
-                        origem: item.origem_receita_descricao || 'Não especificada',
-                        especie: item.especie_receita_descricao || 'Não especificada',
-                        tipo: item.tipo_receita_descricao || 'Não especificado',
-                        previsto: 0,
-                        previstoAtualizado: 0,
-                        contabilizado: 0
-                    });
-                }
-                
-                const grupo = grupos.get(chave);
-                grupo.previsto += item.valor_previsto_inicial || 0;
-                grupo.previstoAtualizado += item.valor_previsto_atualizado || 0;
-                grupo.contabilizado += item.valor_contabilizado || 0;
-            });
-            
-            const dados = Array.from(grupos.values());
-            const cabecalhos = ['Categoria', 'Origem', 'Espécie', 'Tipo', 'Previsto Inicial', 'Previsto Atualizado', 'Contabilizado'];
-            const mapeamento = ['categoria', 'origem', 'especie', 'tipo', 'previsto', 'previstoAtualizado', 'contabilizado'];
-            
-            exportarParaCSV(dados, 'categoria.csv', cabecalhos, mapeamento);
-        };
-
-        window.exportarCategoriaPDF = function() {
-            let dadosFiltrados = aplicarFiltros(dadosCompletos, filtrosCategoria);
-            dadosFiltrados = aplicarBusca(dadosFiltrados, buscaCategoria, [
-                'categoria_receita_descricao', 'origem_receita_descricao', 
-                'especie_receita_descricao', 'tipo_receita_descricao'
-            ]);
-            
-            const grupos = new Map();
-            dadosFiltrados.forEach(item => {
-                const chave = `${item.categoria_receita_descricao}|${item.origem_receita_descricao}|${item.especie_receita_descricao}|${item.tipo_receita_descricao}`;
-                
-                if (!grupos.has(chave)) {
-                    grupos.set(chave, {
-                        categoria: item.categoria_receita_descricao || 'Não categorizado',
-                        origem: item.origem_receita_descricao || 'Não especificada',
-                        especie: item.especie_receita_descricao || 'Não especificada',
-                        tipo: item.tipo_receita_descricao || 'Não especificado',
-                        previsto: item.valor_previsto_inicial || 0,
-                        previstoAtualizado: item.valor_previsto_atualizado || 0,
-                        contabilizado: item.valor_contabilizado || 0
-                    });
-                }
-            });
-            
-            const dados = Array.from(grupos.values());
-            const colunas = ['Categoria', 'Origem', 'Espécie', 'Tipo', 'Prev Inic', 'Prev Atual', 'Contab'];
-            const mapeamento = ['categoria', 'origem', 'especie', 'tipo', 'previsto', 'previstoAtualizado', 'contabilizado'];
-            
-            exportarParaPDF(dados, 'Categoria da Receita', colunas, mapeamento, 'categoria.pdf');
-        };
-
-        window.exportarClassificacaoCSV = function() {
-            let dadosFiltrados = aplicarFiltros(dadosCompletos, filtrosClassificacao);
-            dadosFiltrados = aplicarBusca(dadosFiltrados, buscaClassificacao, [
-                'unidade_orcamentaria_nome', 'classificacao_receita_formatado'
-            ]);
-            
-            const agrupado = {};
-            dadosFiltrados.forEach(item => {
-                const chave = item.classificacao_receita_formatado;
-                if (!agrupado[chave]) {
-                    agrupado[chave] = {
-                        classificacao: item.classificacao_receita_formatado || 'Não classificada',
-                        previsto: 0,
-                        previstoAtualizado: 0,
-                        contabilizado: 0,
-                        orgaos: new Set()
-                    };
-                }
-                agrupado[chave].previsto += item.valor_previsto_inicial || 0;
-                agrupado[chave].previstoAtualizado += item.valor_previsto_atualizado || 0;
-                agrupado[chave].contabilizado += item.valor_contabilizado || 0;
-                agrupado[chave].orgaos.add(item.unidade_orcamentaria_nome);
-            });
-            
-            const dados = Object.values(agrupado).map(item => ({
-                classificacao: item.classificacao,
-                orgaos: Array.from(item.orgaos).join('; '),
-                previsto: item.previsto,
-                previstoAtualizado: item.previstoAtualizado,
-                contabilizado: item.contabilizado
-            }));
-            
-            const cabecalhos = ['Classificação', 'Órgãos', 'Previsto Inicial', 'Previsto Atualizado', 'Contabilizado'];
-            const mapeamento = ['classificacao', 'orgaos', 'previsto', 'previstoAtualizado', 'contabilizado'];
-            
-            exportarParaCSV(dados, 'classificacao.csv', cabecalhos, mapeamento);
-        };
-
-        window.exportarClassificacaoPDF = function() {
-            let dadosFiltrados = aplicarFiltros(dadosCompletos, filtrosClassificacao);
-            dadosFiltrados = aplicarBusca(dadosFiltrados, buscaClassificacao, [
-                'unidade_orcamentaria_nome', 'classificacao_receita_formatado'
-            ]);
-            
-            const agrupado = {};
-            dadosFiltrados.forEach(item => {
-                const chave = item.classificacao_receita_formatado;
-                if (!agrupado[chave]) {
-                    agrupado[chave] = {
-                        classificacao: item.classificacao_receita_formatado || 'Não classificada',
-                        previsto: item.valor_previsto_inicial || 0,
-                        previstoAtualizado: item.valor_previsto_atualizado || 0,
-                        contabilizado: item.valor_contabilizado || 0,
-                        orgaos: new Set()
-                    };
-                }
-                agrupado[chave].orgaos.add(item.unidade_orcamentaria_nome);
-            });
-            
-            const dados = Object.values(agrupado).map(item => ({
-                classificacao: item.classificacao,
-                orgaos: Array.from(item.orgaos).join(', ').substring(0, 50) + '...',
-                previsto: item.previsto,
-                previstoAtualizado: item.previstoAtualizado,
-                contabilizado: item.contabilizado
-            }));
-            
-            const colunas = ['Classificação', 'Órgãos', 'Prev Inic', 'Prev Atual', 'Contab'];
-            const mapeamento = ['classificacao', 'orgaos', 'previsto', 'previstoAtualizado', 'contabilizado'];
-            
-            exportarParaPDF(dados, 'Classificação Orçamentária', colunas, mapeamento, 'classificacao.pdf');
+            exportarParaPDF(dadosFiltrados, 'Detalhamento Completo da Receita', colunas, mapeamento, 'detalhamento_completo.pdf');
         };
 
         // ============================================
@@ -2943,6 +2388,8 @@
                                 <tr><td>especie_receita_descricao</td><td>Descrição da espécie da receita</td><td><span class="tipo-badge tipo-texto">Texto</span></td></tr>
                                 <tr><td>tipo_receita_codigo</td><td>Código do tipo da receita</td><td><span class="tipo-badge tipo-numero">Número</span></td></tr>
                                 <tr><td>tipo_receita_descricao</td><td>Descrição do tipo da receita</td><td><span class="tipo-badge tipo-texto">Texto</span></td></tr>
+                                <tr><td>fonte_recurso_codigo</td><td>Código da fonte de recurso</td><td><span class="tipo-badge tipo-numero">Número</span></td></tr>
+                                <tr><td>fonte_recurso_descricao</td><td>Descrição da fonte de recurso</td><td><span class="tipo-badge tipo-texto">Texto</span></td></tr>
                                 <tr><td>item_receita_codigo</td><td>Código do item da receita</td><td><span class="tipo-badge tipo-numero">Número</span></td></tr>
                                 <tr><td>item_receita_descricao</td><td>Descrição do item da receita</td><td><span class="tipo-badge tipo-texto">Texto</span></td></tr>
                                 <tr><td>subitem_receita_codigo</td><td>Código do subitem da receita</td><td><span class="tipo-badge tipo-numero">Número</span></td></tr>
